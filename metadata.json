@@ -1,0 +1,6 @@
+{
+  "name": "CodeShelf",
+  "description": "A public multi-language code repository and interactive developer learning hub with client-side execution, smart editor, and curated snippet library.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

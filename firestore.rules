@@ -1,0 +1,189 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default-deny all unmapped paths
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'shakti14112008@gmail.com' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    function isValidSnippet(data) {
+      return data.keys().hasAll(['id', 'title', 'language', 'code', 'createdAt', 'likes', 'views', 'bookmarksCount']) &&
+        data.keys().hasOnly(['id', 'title', 'description', 'language', 'difficulty', 'category', 'tags', 'code', 'sampleOutput', 'createdAt', 'likes', 'views', 'bookmarksCount', 'isCommunitySubmitted', 'userId', 'userEmail', 'authorEmail', 'authorId', 'isGuest', 'author', 'teamId', 'teamName', 'teamOwnerId', 'teamOwnerEmail', 'uploadedByMember', 'isTeamSnippet']) &&
+        data.id is string && data.id.size() <= 128 && data.id.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.title is string && data.title.size() > 0 && data.title.size() <= 200 &&
+        data.language is string && data.language.size() <= 32 &&
+        data.code is string && data.code.size() > 0 && data.code.size() <= 50000 &&
+        (!('description' in data) || (data.description is string && data.description.size() <= 2000)) &&
+        (!('difficulty' in data) || (data.difficulty in ['Beginner', 'Intermediate', 'Advanced'])) &&
+        (!('category' in data) || (data.category is string && data.category.size() <= 50)) &&
+        (!('tags' in data) || (data.tags is list && data.tags.size() <= 10 && (data.tags.size() == 0 || data.tags[0] is string))) &&
+        (!('sampleOutput' in data) || (data.sampleOutput is string && data.sampleOutput.size() <= 10000)) &&
+        data.createdAt is string && data.createdAt.size() <= 50 &&
+        data.likes is number && data.likes >= 0 &&
+        data.views is number && data.views >= 0 &&
+        data.bookmarksCount is number && data.bookmarksCount >= 0 &&
+        (!('isCommunitySubmitted' in data) || data.isCommunitySubmitted is bool) &&
+        (!('userId' in data) || (data.userId is string && data.userId.size() <= 128)) &&
+        (!('userEmail' in data) || (data.userEmail is string && data.userEmail.size() <= 128)) &&
+        (!('authorEmail' in data) || (data.authorEmail is string && data.authorEmail.size() <= 128)) &&
+        (!('authorId' in data) || (data.authorId is string && data.authorId.size() <= 128)) &&
+        (!('isGuest' in data) || data.isGuest is bool) &&
+        (!('author' in data) || data.author is map) &&
+        (!('teamId' in data) || (data.teamId is string && data.teamId.size() <= 128)) &&
+        (!('teamName' in data) || (data.teamName is string && data.teamName.size() <= 100)) &&
+        (!('teamOwnerId' in data) || (data.teamOwnerId is string && data.teamOwnerId.size() <= 128)) &&
+        (!('teamOwnerEmail' in data) || (data.teamOwnerEmail is string && data.teamOwnerEmail.size() <= 128)) &&
+        (!('uploadedByMember' in data) || (data.uploadedByMember is string && data.uploadedByMember.size() <= 100)) &&
+        (!('isTeamSnippet' in data) || data.isTeamSnippet is bool);
+    }
+
+    function isValidTeam(data) {
+      return data.keys().hasAll(['id', 'name', 'pin', 'ownerId', 'ownerEmail', 'createdAt']) &&
+        data.keys().hasOnly(['id', 'name', 'pin', 'ownerId', 'ownerEmail', 'ownerName', 'createdAt', 'snippetCount', 'membersCount', 'description']) &&
+        data.id is string && data.id.size() >= 3 && data.id.size() <= 128 && data.id.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+        data.pin is string && data.pin.size() >= 3 && data.pin.size() <= 32 &&
+        data.ownerId is string && data.ownerId.size() <= 128 &&
+        data.ownerEmail is string && data.ownerEmail.size() <= 128 &&
+        (!('ownerName' in data) || (data.ownerName is string && data.ownerName.size() <= 100)) &&
+        data.createdAt is string && data.createdAt.size() <= 50 &&
+        (!('snippetCount' in data) || (data.snippetCount is number && data.snippetCount >= 0)) &&
+        (!('membersCount' in data) || (data.membersCount is number && data.membersCount >= 0)) &&
+        (!('description' in data) || (data.description is string && data.description.size() <= 500));
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['id', 'email']) &&
+        data.keys().hasOnly(['id', 'name', 'email', 'avatar', 'role', 'createdAt']) &&
+        data.id is string && data.id.size() <= 128 && data.id.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.email is string && data.email.size() <= 128 &&
+        (!('name' in data) || (data.name is string && data.name.size() <= 100)) &&
+        (!('avatar' in data) || (data.avatar is string && data.avatar.size() <= 500)) &&
+        (!('role' in data) || (data.role is string && data.role.size() <= 32)) &&
+        (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 50));
+    }
+
+    // Public Snippets Collection
+    match /snippets/{snippetId} {
+      allow get: if isValidId(snippetId);
+      allow list: if resource.data.isCommunitySubmitted == true;
+
+      allow create: if isVerifiedUser() &&
+        isValidId(snippetId) &&
+        incoming().id == snippetId &&
+        incoming().userId == request.auth.uid &&
+        isValidSnippet(incoming());
+
+      allow update: if isValidId(snippetId) &&
+        isValidSnippet(incoming()) && (
+          // Content update by owner
+          (isVerifiedUser() &&
+            existing().userId == request.auth.uid &&
+            incoming().userId == existing().userId &&
+            incoming().id == existing().id &&
+            incoming().createdAt == existing().createdAt &&
+            incoming().diff(existing()).affectedKeys().hasOnly(['title', 'description', 'language', 'difficulty', 'category', 'tags', 'code', 'sampleOutput'])) ||
+          // Like counter step
+          (incoming().diff(existing()).affectedKeys().hasOnly(['likes']) &&
+            (incoming().likes == existing().likes + 1 || incoming().likes == existing().likes - 1)) ||
+          // View counter increment
+          (incoming().diff(existing()).affectedKeys().hasOnly(['views']) &&
+            incoming().views == existing().views + 1) ||
+          // Bookmark counter step
+          (incoming().diff(existing()).affectedKeys().hasOnly(['bookmarksCount']) &&
+            (incoming().bookmarksCount == existing().bookmarksCount + 1 || incoming().bookmarksCount == existing().bookmarksCount - 1)) ||
+          isAdmin()
+        );
+
+      allow delete: if isValidId(snippetId) && (
+        isAdmin() ||
+        (isVerifiedUser() && (existing().userId == request.auth.uid || existing().userEmail == request.auth.token.email))
+      );
+    }
+
+    // Isolated Private User Profiles
+    match /users/{userId} {
+      allow get: if isValidId(userId) && (isOwner(userId) || isAdmin());
+      allow list: if false;
+
+      allow create: if isVerifiedUser() &&
+        isValidId(userId) &&
+        userId == request.auth.uid &&
+        incoming().id == userId &&
+        isValidUser(incoming());
+
+      allow update: if isVerifiedUser() &&
+        isValidId(userId) &&
+        userId == request.auth.uid &&
+        incoming().id == userId &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['name', 'avatar']) &&
+        isValidUser(incoming());
+
+      allow delete: if isValidId(userId) && (isOwner(userId) || isAdmin());
+    }
+
+    // Collaborative Workspace Teams
+    match /teams/{teamId} {
+      allow get: if isValidId(teamId);
+      allow list: if isSignedIn() && (resource.data.ownerId == request.auth.uid || isAdmin());
+
+      allow create: if isVerifiedUser() &&
+        isValidId(teamId) &&
+        incoming().id == teamId &&
+        incoming().ownerId == request.auth.uid &&
+        isValidTeam(incoming());
+
+      allow update: if isValidId(teamId) && (
+        isAdmin() ||
+        (isVerifiedUser() && existing().ownerId == request.auth.uid && incoming().ownerId == existing().ownerId) ||
+        (incoming().diff(existing()).affectedKeys().hasOnly(['membersCount']) && incoming().membersCount >= existing().membersCount) ||
+        (incoming().diff(existing()).affectedKeys().hasOnly(['snippetCount']) && incoming().snippetCount >= existing().snippetCount)
+      );
+
+      allow delete: if isValidId(teamId) && (isAdmin() || (isVerifiedUser() && existing().ownerId == request.auth.uid));
+    }
+
+    // Moderation & Bug Reports
+    match /reports/{reportId} {
+      allow get: if isValidId(reportId) && isAdmin();
+      allow list: if isAdmin();
+      allow create: if isValidId(reportId) &&
+        incoming().id == reportId &&
+        incoming().description is string && incoming().description.size() > 0 && incoming().description.size() <= 3000;
+      allow update, delete: if isValidId(reportId) && isAdmin();
+    }
+  }
+}
