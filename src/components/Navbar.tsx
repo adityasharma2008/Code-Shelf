@@ -115,7 +115,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <CodeSelfLogo className="w-8 h-8 sm:w-9 sm:h-9 shrink-0 transition-transform duration-200 group-hover:scale-105" />
           <div className="flex flex-col text-left leading-none">
             <span className="text-base sm:text-lg font-bold tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors">
-              CodeSelf
+              Chulli Code
             </span>
             <span className="text-[10px] font-medium tracking-wide text-slate-500 mt-1 hidden sm:block">
               Powered by <span className="font-semibold text-blue-600">ChulliTech</span>
