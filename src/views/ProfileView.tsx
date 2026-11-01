@@ -4,7 +4,7 @@ import { authService } from '../services/authService';
 import { snippetStorage } from '../services/snippetStorage';
 import { gamificationService } from '../services/gamificationService';
 import { LANGUAGES } from '../data/languages';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { 
   User as UserIcon, Mail, Shield, Calendar, Edit3, Check, 
   Flame, Trophy, Award, Code2, Eye, Heart, ExternalLink, 
@@ -31,7 +31,15 @@ const PRESET_AVATARS = [
 
 export const ProfileView: React.FC<ProfileViewProps> = ({ onToast, onRequestAuth }) => {
   const navigate = useNavigate();
+  const { userId } = useParams<{ userId?: string }>();
   const [currentUser, setCurrentUser] = useState<User | null>(() => authService.getCurrentUser());
+  
+  const isOwnProfile = !userId || (currentUser && (
+    currentUser.id === userId || 
+    currentUser.uid === userId || 
+    currentUser.email.split('@')[0] === userId
+  ));
+
   const [mySnippets, setMySnippets] = useState<Snippet[]>(() => {
     const user = authService.getCurrentUser();
     if (!user) return [];

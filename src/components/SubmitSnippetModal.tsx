@@ -31,9 +31,12 @@ export const SubmitSnippetModal: React.FC<SubmitSnippetModalProps> = ({
   const [difficulty, setDifficulty] = useState<Difficulty>('Beginner');
   const [category, setCategory] = useState<CategoryTag>('DSA');
   const [description, setDescription] = useState('');
+  const [explanation, setExplanation] = useState('');
   const [tagInput, setTagInput] = useState('');
   const [code, setCode] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [hasSavedDraft, setHasSavedDraft] = useState(false);
+  const [draftNotice, setDraftNotice] = useState<string | null>(null);
 
   // Guest name prompt state
   const [showGuestNameModal, setShowGuestNameModal] = useState(false);
@@ -46,6 +49,64 @@ export const SubmitSnippetModal: React.FC<SubmitSnippetModalProps> = ({
 
   const [limitStatus, setLimitStatus] = useState(() => authService.getGuestLimitStatus());
   const [activeTeam, setActiveTeam] = useState<ActiveTeamSession | null>(() => teamService.getActiveTeam());
+
+  useEffect(() => {
+    if (isOpen) {
+      try {
+        const raw = localStorage.getItem('chullicode_snippet_draft');
+        if (raw) {
+          const draft = JSON.parse(raw);
+          if (draft && (draft.title || draft.code)) {
+            setHasSavedDraft(true);
+          }
+        }
+      } catch {}
+    }
+  }, [isOpen]);
+
+  const handleRestoreDraft = () => {
+    try {
+      const raw = localStorage.getItem('chullicode_snippet_draft');
+      if (raw) {
+        const draft = JSON.parse(raw);
+        if (draft.title) setTitle(draft.title);
+        if (draft.language) setLanguage(draft.language);
+        if (draft.difficulty) setDifficulty(draft.difficulty);
+        if (draft.category) setCategory(draft.category);
+        if (draft.description) setDescription(draft.description);
+        if (draft.tagInput) setTagInput(draft.tagInput);
+        if (draft.code) setCode(draft.code);
+        if (draft.explanation) setExplanation(draft.explanation);
+        setHasSavedDraft(false);
+        setDraftNotice('Draft restored!');
+        setTimeout(() => setDraftNotice(null), 3000);
+      }
+    } catch {}
+  };
+
+  const handleDiscardDraft = () => {
+    try {
+      localStorage.removeItem('chullicode_snippet_draft');
+      setHasSavedDraft(false);
+    } catch {}
+  };
+
+  const handleSaveDraft = () => {
+    try {
+      localStorage.setItem('chullicode_snippet_draft', JSON.stringify({
+        title,
+        language,
+        difficulty,
+        category,
+        description,
+        explanation,
+        tagInput,
+        code
+      }));
+      setDraftNotice('Draft saved to browser storage! You can return later.');
+      setTimeout(() => setDraftNotice(null), 3000);
+    } catch {}
+  };
 
   useEffect(() => {
     const updateLimit = () => {
@@ -185,10 +246,15 @@ export const SubmitSnippetModal: React.FC<SubmitSnippetModalProps> = ({
     // Reset form state for next submission
     setTitle('');
     setDescription('');
+    setExplanation('');
     setTagInput('');
     setCode('');
     setTestResult(null);
     setError(null);
+    try {
+      localStorage.removeItem('chullicode_snippet_draft');
+      setHasSavedDraft(false);
+    } catch {}
 
     onClose();
     if (result.snippet) {
@@ -197,31 +263,31 @@ export const SubmitSnippetModal: React.FC<SubmitSnippetModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/50 backdrop-blur-xs">
-      {/* Modal Dialog with controlled max-height preventing viewport clipping at 100% zoom */}
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs">
+      {/* Modal Dialog with controlled max-height preventing viewport clipping */}
       <div 
-        className="relative w-full max-w-3xl max-h-[90vh] bg-white border border-slate-200 rounded-xl shadow-2xl flex flex-col overflow-hidden text-slate-900 my-auto"
+        className="relative w-full max-w-3xl max-h-[90vh] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl flex flex-col overflow-hidden text-slate-900 dark:text-slate-100 my-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Fixed Header */}
-        <div className="p-5 sm:p-6 pb-3 border-b border-slate-100 flex items-start justify-between shrink-0 bg-white">
+        <div className="p-5 sm:p-6 pb-3 border-b border-slate-100 dark:border-slate-800 flex items-start justify-between shrink-0 bg-white dark:bg-slate-900">
           <div>
             <div className="flex items-center gap-2.5 mb-1">
-              <div className="p-2 bg-blue-50 border border-blue-100 rounded-lg text-blue-600">
+              <div className="p-2 bg-blue-50 dark:bg-blue-950/60 border border-blue-100 dark:border-blue-900/60 rounded-lg text-blue-600 dark:text-blue-400">
                 <Upload className="w-5 h-5" />
               </div>
-              <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
                 Submit Code to Library
               </h2>
             </div>
-            <p className="text-xs sm:text-sm text-slate-500">
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
               Publish an algorithm, SQL query, or utility pattern to the community repository.
             </p>
           </div>
 
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer shrink-0"
+            className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
             title="Close"
           >
             <X className="w-5 h-5" />
@@ -234,15 +300,55 @@ export const SubmitSnippetModal: React.FC<SubmitSnippetModalProps> = ({
           onSubmit={handleSubmit} 
           className="overflow-y-auto flex-1 p-5 sm:p-6 space-y-4"
         >
+          {/* Draft Notification Toast */}
+          {draftNotice && (
+            <div className="py-2 px-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-lg text-xs text-emerald-800 dark:text-emerald-300 flex items-center justify-between">
+              <span>{draftNotice}</span>
+              <button
+                type="button"
+                onClick={() => setDraftNotice(null)}
+                className="text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer"
+              >
+                Dismiss
+              </button>
+            </div>
+          )}
+
+          {/* Draft Found Banner */}
+          {hasSavedDraft && (
+            <div className="py-2.5 px-3 bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 rounded-lg flex items-center justify-between gap-2 text-xs text-blue-900 dark:text-blue-200">
+              <div className="flex items-center gap-2">
+                <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                <span>You have an unsaved draft from a previous session.</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleRestoreDraft}
+                  className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium text-xs cursor-pointer shadow-xs"
+                >
+                  Restore Draft
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDiscardDraft}
+                  className="px-2 py-1 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded hover:bg-slate-200/60 dark:hover:bg-slate-800 text-xs cursor-pointer"
+                >
+                  Discard
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Active Team Workspace Banner (Unlocks unlimited submissions) */}
           {activeTeam ? (
-            <div className="py-2.5 px-3 bg-emerald-50 border border-emerald-200 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-emerald-950">
+            <div className="py-2.5 px-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-emerald-950 dark:text-emerald-200">
               <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <span>
-                  Team Workspace: <strong className="font-semibold text-emerald-900">{activeTeam.teamName}</strong>
-                  <span className="text-emerald-700 font-normal"> (as {activeTeam.memberName})</span>
-                  <span className="ml-1.5 px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-200/80 text-emerald-800">
+                  Team Workspace: <strong className="font-semibold text-emerald-900 dark:text-emerald-100">{activeTeam.teamName}</strong>
+                  <span className="text-emerald-700 dark:text-emerald-300 font-normal"> (as {activeTeam.memberName})</span>
+                  <span className="ml-1.5 px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-200/80 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200">
                     Unlimited Active
                   </span>
                 </span>
@@ -254,18 +360,18 @@ export const SubmitSnippetModal: React.FC<SubmitSnippetModalProps> = ({
                     onClose();
                     onOpenTeam('active');
                   }}
-                  className="text-emerald-700 hover:text-emerald-900 hover:underline font-medium text-[11px] cursor-pointer text-left sm:text-right"
+                  className="text-emerald-700 dark:text-emerald-400 hover:text-emerald-900 dark:hover:text-emerald-200 hover:underline font-medium text-[11px] cursor-pointer text-left sm:text-right"
                 >
                   Manage Team
                 </button>
               )}
             </div>
           ) : limitStatus.isGuest ? (
-            <div className="py-2.5 px-3 bg-blue-50 border border-blue-200 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-blue-900">
+            <div className="py-2.5 px-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/60 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-blue-900 dark:text-blue-200">
               <div className="flex items-center gap-2">
-                <Info className="w-4 h-4 text-blue-600 shrink-0" />
+                <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
                 <span>
-                  Guest Device: <span className="font-semibold text-blue-800">Remaining Submissions: {limitStatus.remaining}/{limitStatus.maxLimit}</span>
+                  Guest Device: <span className="font-semibold text-blue-800 dark:text-blue-300">Remaining Submissions: {limitStatus.remaining}/{limitStatus.maxLimit}</span>
                 </span>
               </div>
               <div className="flex items-center gap-3">
@@ -276,7 +382,7 @@ export const SubmitSnippetModal: React.FC<SubmitSnippetModalProps> = ({
                       onClose();
                       onOpenTeam('join');
                     }}
-                    className="text-indigo-600 hover:text-indigo-800 font-semibold text-[11px] cursor-pointer flex items-center gap-1"
+                    className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-semibold text-[11px] cursor-pointer flex items-center gap-1"
                     title="Upload unlimited code with a Team ID and PIN"
                   >
                     <Users className="w-3 h-3" />
@@ -289,7 +395,7 @@ export const SubmitSnippetModal: React.FC<SubmitSnippetModalProps> = ({
                     onClose();
                     onRequestAuth('Sign in to unlock unlimited code submissions.');
                   }}
-                  className="text-blue-700 hover:text-blue-900 hover:underline font-medium text-[11px] cursor-pointer"
+                  className="text-blue-700 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 hover:underline font-medium text-[11px] cursor-pointer"
                 >
                   Sign in
                 </button>
@@ -298,15 +404,15 @@ export const SubmitSnippetModal: React.FC<SubmitSnippetModalProps> = ({
           ) : null}
 
           {error && (
-            <div className="p-3 bg-rose-50 border border-rose-200 rounded-lg text-rose-700 text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+            <div className="p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 rounded-lg text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" />
               <span>{error}</span>
             </div>
           )}
 
           {/* Title */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
               Snippet Title <span className="text-rose-500">*</span>
             </label>
             <input
@@ -315,18 +421,18 @@ export const SubmitSnippetModal: React.FC<SubmitSnippetModalProps> = ({
               placeholder="e.g. Simple Multiplication Table"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full bg-white border border-slate-300 rounded-lg py-2 px-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+              className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg py-2 px-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
             />
           </div>
 
           {/* Selectors */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Language</label>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Language</label>
               <select
                 value={language}
                 onChange={(e) => handleLanguageChange(e.target.value as Language)}
-                className="w-full bg-white border border-slate-300 rounded-lg py-2 px-3 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-600"
+                className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg py-2 px-3 text-xs sm:text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-600"
               >
                 {Object.values(LANGUAGES).map(lang => (
                   <option key={lang.id} value={lang.id}>
@@ -337,11 +443,11 @@ export const SubmitSnippetModal: React.FC<SubmitSnippetModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Difficulty</label>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Difficulty</label>
               <select
                 value={difficulty}
                 onChange={(e) => setDifficulty(e.target.value as Difficulty)}
-                className="w-full bg-white border border-slate-300 rounded-lg py-2 px-3 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-600"
+                className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg py-2 px-3 text-xs sm:text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-600"
               >
                 {DIFFICULTY_LEVELS.map(lvl => (
                   <option key={lvl.id} value={lvl.id}>
@@ -352,11 +458,11 @@ export const SubmitSnippetModal: React.FC<SubmitSnippetModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Category</label>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Category</label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as CategoryTag)}
-                className="w-full bg-white border border-slate-300 rounded-lg py-2 px-3 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-blue-600"
+                className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg py-2 px-3 text-xs sm:text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-600"
               >
                 {CATEGORIES.filter(c => c.id !== 'All').map(cat => (
                   <option key={cat.id} value={cat.id}>
@@ -369,7 +475,7 @@ export const SubmitSnippetModal: React.FC<SubmitSnippetModalProps> = ({
 
           {/* Description */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
               Description <span className="text-rose-500">*</span>
             </label>
             <textarea
@@ -378,13 +484,27 @@ export const SubmitSnippetModal: React.FC<SubmitSnippetModalProps> = ({
               placeholder="Briefly describe what this snippet does, time complexity, or usage instructions..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full bg-white border border-slate-300 rounded-lg py-2 px-3 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 resize-none"
+              className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg py-2 px-3 text-xs sm:text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 resize-none"
+            />
+          </div>
+
+          {/* Explanation (Optional) */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              Explanation & Approach <span className="text-slate-400 font-normal">(optional)</span>
+            </label>
+            <textarea
+              rows={2}
+              placeholder="Explain algorithmic intuition, time/space complexity O(n), or edge cases handled..."
+              value={explanation}
+              onChange={(e) => setExplanation(e.target.value)}
+              className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg py-2 px-3 text-xs sm:text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 resize-none"
             />
           </div>
 
           {/* Tags */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
               Tags <span className="text-slate-400 font-normal">(comma-separated)</span>
             </label>
             <input
@@ -392,14 +512,14 @@ export const SubmitSnippetModal: React.FC<SubmitSnippetModalProps> = ({
               placeholder="e.g. Basics, Loops, Math"
               value={tagInput}
               onChange={(e) => setTagInput(e.target.value)}
-              className="w-full bg-white border border-slate-300 rounded-lg py-2 px-3 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+              className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg py-2 px-3 text-xs sm:text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
             />
           </div>
 
           {/* Source Code Editor with controlled height: height: 220px, min-h-[200px] */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="block text-xs font-semibold text-slate-700">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Source Code <span className="text-rose-500">*</span>
               </label>
               <div className="flex items-center gap-2.5">
@@ -408,18 +528,18 @@ export const SubmitSnippetModal: React.FC<SubmitSnippetModalProps> = ({
                   onClick={handleTestRun}
                   disabled={isRunningTest}
                   title="Test Run Code (Ctrl + Enter)"
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs text-blue-700 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-md font-medium transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs text-blue-700 dark:text-blue-300 hover:text-blue-800 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 dark:hover:bg-blue-900/50 border border-blue-200 dark:border-blue-800 rounded-md font-medium transition-colors cursor-pointer"
                 >
-                  <Play className="w-3 h-3 fill-blue-600 text-blue-600" />
+                  <Play className="w-3 h-3 fill-blue-600 dark:fill-blue-400 text-blue-600 dark:text-blue-400" />
                   <span>{isRunningTest ? 'Testing...' : 'Test Run'}</span>
-                  <span className="hidden sm:inline-block text-[10px] text-blue-600 font-mono">
+                  <span className="hidden sm:inline-block text-[10px] text-blue-600 dark:text-blue-400 font-mono">
                     Ctrl+↵
                   </span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setCode((LANGUAGES as any)[language]?.sampleBoilerplate || '')}
-                  className="text-xs text-blue-600 hover:text-blue-800 font-medium cursor-pointer"
+                  className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium cursor-pointer"
                   title="Optionally populate with starter code"
                 >
                   Load Starter Template
@@ -466,20 +586,28 @@ export const SubmitSnippetModal: React.FC<SubmitSnippetModalProps> = ({
         </form>
 
         {/* Sticky/Fixed Modal Footer at the bottom: Never hidden or cut off */}
-        <div className="sticky bottom-0 bg-white py-3 px-5 sm:px-6 border-t border-slate-200 mt-auto flex items-center justify-between z-10 shrink-0">
-          <div className="text-xs text-slate-500 hidden sm:flex items-center gap-1.5">
+        <div className="sticky bottom-0 bg-white dark:bg-slate-900 py-3 px-5 sm:px-6 border-t border-slate-200 dark:border-slate-800 mt-auto flex items-center justify-between z-10 shrink-0">
+          <div className="text-xs text-slate-500 dark:text-slate-400 hidden sm:flex items-center gap-1.5">
             <span>Shortcut:</span>
-            <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded text-[11px] font-mono text-slate-600">
+            <kbd className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded text-[11px] font-mono text-slate-600 dark:text-slate-300">
               Ctrl + Enter
             </kbd>
             <span>runs code</span>
           </div>
 
-          <div className="flex items-center gap-3 ml-auto">
+          <div className="flex items-center gap-2 sm:gap-3 ml-auto">
+            <button
+              type="button"
+              onClick={handleSaveDraft}
+              className="px-3 py-2 text-xs sm:text-sm text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer border border-slate-200 dark:border-slate-700"
+              title="Save draft to local storage"
+            >
+              Save Draft
+            </button>
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs sm:text-sm text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
+              className="px-3 py-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
             >
               Cancel
             </button>
@@ -505,30 +633,30 @@ export const SubmitSnippetModal: React.FC<SubmitSnippetModalProps> = ({
           }}
         >
           <div 
-            className="bg-white border border-slate-200 rounded-2xl shadow-2xl max-w-md w-full p-6 text-slate-900 animate-in zoom-in-95 duration-150 text-left"
+            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl max-w-md w-full p-6 text-slate-900 dark:text-slate-100 animate-in zoom-in-95 duration-150 text-left"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl border border-blue-100">
+              <div className="p-2.5 bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 rounded-xl border border-blue-100 dark:border-blue-900/60">
                 <UserIcon className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-slate-900">
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">
                   Enter Display Name
                 </h3>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
                   Submitting as a Guest contributor
                 </p>
               </div>
             </div>
 
-            <p className="text-xs text-slate-600 mb-4 leading-relaxed">
-              Choose a display name so others can recognize your contributions. Your snippet will appear in the library with your entered name and an explicit <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">Guest</span> badge.
+            <p className="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">
+              Choose a display name so others can recognize your contributions. Your snippet will appear in the library with your entered name and an explicit <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">Guest</span> badge.
             </p>
 
             <form onSubmit={handleGuestSubmit}>
               <div className="space-y-1.5 mb-4">
-                <label className="block text-xs font-semibold text-slate-700">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
                   Your Display Name <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -541,26 +669,26 @@ export const SubmitSnippetModal: React.FC<SubmitSnippetModalProps> = ({
                   }}
                   placeholder="e.g. Alex M, DevCoder, Sarah"
                   maxLength={40}
-                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-slate-900 placeholder:text-slate-400 bg-white"
+                  className="w-full px-3 py-2 text-xs border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 bg-white dark:bg-slate-800"
                 />
                 {guestNameError && (
-                  <p className="text-xs text-rose-600 flex items-center gap-1 mt-1">
+                  <p className="text-xs text-rose-600 dark:text-rose-400 flex items-center gap-1 mt-1">
                     <AlertCircle className="w-3.5 h-3.5" />
                     <span>{guestNameError}</span>
                   </p>
                 )}
               </div>
 
-              <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-[11px] text-slate-600 mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+              <div className="p-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-lg text-[11px] text-slate-600 dark:text-slate-400 mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                 <span>Submissions are remembered on this device and can be deleted anytime to recover slots.</span>
-                <span className="font-semibold text-blue-700 whitespace-nowrap font-mono">Remaining: {limitStatus.remaining}/{limitStatus.maxLimit}</span>
+                <span className="font-semibold text-blue-700 dark:text-blue-400 whitespace-nowrap font-mono">Remaining: {limitStatus.remaining}/{limitStatus.maxLimit}</span>
               </div>
 
               <div className="flex items-center justify-end gap-2.5">
                 <button
                   type="button"
                   onClick={() => setShowGuestNameModal(false)}
-                  className="px-3.5 py-2 text-xs font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer border border-slate-200"
+                  className="px-3.5 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer border border-slate-200 dark:border-slate-700"
                 >
                   Back to Editor
                 </button>

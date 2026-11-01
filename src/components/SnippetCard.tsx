@@ -128,26 +128,26 @@ export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onToast, onDe
   return (
     <div
       onClick={() => navigate(`/snippet/${snippet?.id}`)}
-      className="group relative flex flex-col bg-white hover:bg-slate-50/50 border border-slate-200 hover:border-slate-300 rounded-xl p-5 transition-all duration-150 cursor-pointer shadow-xs hover:shadow-md"
+      className="group relative flex flex-col bg-white dark:bg-slate-900 hover:bg-slate-50/70 dark:hover:bg-slate-800/60 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 rounded-xl p-5 transition-all duration-150 cursor-pointer shadow-xs hover:shadow-md text-left"
     >
       {/* Top Header Row: Clean unboxed metadata discipline */}
-      <div className="flex items-center justify-between gap-3 text-xs text-slate-500 mb-3">
+      <div className="flex items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400 mb-3">
         <div className="flex items-center gap-2">
-          <span className="font-semibold text-slate-800">
+          <span className="font-semibold text-slate-800 dark:text-slate-200">
             {langMeta.name}
           </span>
-          <span className="text-slate-300">·</span>
-          <span className="text-slate-600 font-medium">
+          <span className="text-slate-300 dark:text-slate-700">·</span>
+          <span className="text-slate-600 dark:text-slate-400 font-medium">
             {snippet?.category || 'General'}
           </span>
-          <span className="text-slate-300">·</span>
+          <span className="text-slate-300 dark:text-slate-700">·</span>
           <span
             className={
               snippet?.difficulty === 'Beginner'
-                ? 'text-emerald-700 font-medium'
+                ? 'text-emerald-700 dark:text-emerald-400 font-medium'
                 : snippet?.difficulty === 'Intermediate'
-                ? 'text-amber-700 font-medium'
-                : 'text-rose-700 font-medium'
+                ? 'text-amber-700 dark:text-amber-400 font-medium'
+                : 'text-rose-700 dark:text-rose-400 font-medium'
             }
           >
             {snippet?.difficulty}
@@ -159,21 +159,21 @@ export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onToast, onDe
           <button
             onClick={handleShareLink}
             title="Copy shareable link"
-            className="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
+            className="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors cursor-pointer"
           >
-            {linkCopied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Share2 className="w-3.5 h-3.5" />}
+            {linkCopied ? <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" /> : <Share2 className="w-3.5 h-3.5" />}
           </button>
           <button
             onClick={handleCopy}
             title="Copy code"
-            className="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
+            className="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors cursor-pointer"
           >
-            {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+            {copied ? <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
           </button>
           <button
             onClick={handleDownload}
             title={`Download .${langMeta.extension}`}
-            className="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
+            className="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors cursor-pointer"
           >
             <Download className="w-3.5 h-3.5" />
           </button>
@@ -181,7 +181,7 @@ export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onToast, onDe
             onClick={handleBookmark}
             title={isBookmarked ? 'Bookmarked' : 'Bookmark snippet'}
             className={`p-1 rounded-md transition-colors cursor-pointer ${
-              isBookmarked ? 'text-blue-600 bg-blue-50' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-100'
+              isBookmarked ? 'text-blue-600 bg-blue-50 dark:bg-blue-950/60' : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
             <Bookmark className={`w-3.5 h-3.5 ${isBookmarked ? 'fill-blue-600' : ''}`} />
@@ -190,7 +190,7 @@ export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onToast, onDe
             <button
               onClick={handleDeleteClick}
               title="Delete snippet"
-              className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-md transition-colors cursor-pointer"
+              className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-md transition-colors cursor-pointer"
             >
               <Trash2 className="w-3.5 h-3.5" />
             </button>
@@ -200,10 +200,10 @@ export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onToast, onDe
 
       {/* Snippet Title & Description */}
       <div className="mb-3">
-        <h3 className="text-base font-semibold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-1">
+        <h3 className="text-base font-semibold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1">
           {snippet?.title}
         </h3>
-        <p className="mt-1 text-xs text-slate-600 line-clamp-2 leading-relaxed">
+        <p className="mt-1 text-xs text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed">
           {snippet?.description}
         </p>
       </div>
@@ -216,9 +216,9 @@ export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onToast, onDe
 
       {/* Tags row */}
       {snippet?.tags && snippet.tags.length > 0 && (
-        <div className="flex flex-wrap items-center gap-1.5 mt-2 mb-3 text-[11px] text-slate-500">
+        <div className="flex flex-wrap items-center gap-1.5 mt-2 mb-3 text-[11px] text-slate-500 dark:text-slate-400">
           {snippet.tags.slice(0, 3).map((tag, idx) => (
-            <span key={idx} className="text-slate-500 font-mono">
+            <span key={idx} className="font-mono">
               #{tag}
             </span>
           ))}
@@ -229,21 +229,21 @@ export const SnippetCard: React.FC<SnippetCardProps> = ({ snippet, onToast, onDe
       )}
 
       {/* Footer: Author, views, like counter, and run affordance */}
-      <div className="mt-auto pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+      <div className="mt-auto pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
         <div className="flex items-center gap-1.5 min-w-0">
           {snippet?.author?.avatar ? (
             <img
               src={snippet.author.avatar}
               alt={snippet.author.name}
-              className="w-5 h-5 rounded-full object-cover border border-slate-200 shrink-0"
+              className="w-5 h-5 rounded-full object-cover border border-slate-200 dark:border-slate-700 shrink-0"
               referrerPolicy="no-referrer"
             />
           ) : (
-            <div className="w-5 h-5 rounded-full bg-slate-100 text-[10px] flex items-center justify-center font-bold text-slate-700 border border-slate-200 shrink-0">
+            <div className="w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] flex items-center justify-center font-bold text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shrink-0">
               {snippet?.author?.name?.[0]?.toUpperCase() || 'G'}
             </div>
           )}
-          <span className="text-slate-700 truncate max-w-[95px] text-xs font-medium">
+          <span className="text-slate-700 dark:text-slate-300 truncate max-w-[95px] text-xs font-medium">
             {snippet?.author?.name || 'Guest'}
           </span>
           {snippet?.teamName ? (

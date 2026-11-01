@@ -178,10 +178,10 @@ export const LearnView: React.FC<LearnViewProps> = ({
       {/* Language Course Tracks Selector Bar */}
       <div>
         <div className="flex items-center justify-between mb-3 px-1">
-          <h2 className="text-sm sm:text-base font-bold text-slate-900">
+          <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
             Select Programming Track
           </h2>
-          <span className="text-xs text-slate-500 font-medium">
+          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
             {COURSES.length} Comprehensive Tracks Available
           </span>
         </div>
@@ -189,7 +189,7 @@ export const LearnView: React.FC<LearnViewProps> = ({
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
           {COURSES.map((course) => {
             const isSelected = course.id === activeCourseId;
-            const lang = LANGUAGES[course.language] || { name: course.language, color: 'text-slate-700' };
+            const lang = LANGUAGES[course.language] || { name: course.language, color: 'text-slate-700 dark:text-slate-300' };
             const pts = languagePoints[course.language] || 0;
 
             return (
@@ -199,8 +199,8 @@ export const LearnView: React.FC<LearnViewProps> = ({
                 onClick={() => handleSelectCourse(course.id)}
                 className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer relative flex flex-col justify-between ${
                   isSelected
-                    ? 'bg-blue-50/70 border-blue-600 ring-2 ring-blue-600/20 shadow-xs'
-                    : 'bg-white border-slate-200 hover:border-slate-300 hover:shadow-2xs'
+                    ? 'bg-blue-50/70 dark:bg-blue-950/50 border-blue-600 dark:border-blue-500 ring-2 ring-blue-600/20 shadow-xs'
+                    : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-2xs'
                 }`}
               >
                 <div>
@@ -208,19 +208,19 @@ export const LearnView: React.FC<LearnViewProps> = ({
                     <span className={`text-xs font-bold ${lang.color}`}>
                       {lang.name}
                     </span>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-medium">
                       {course.level}
                     </span>
                   </div>
 
-                  <h3 className="text-xs sm:text-sm font-bold text-slate-900 leading-tight">
+                  <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white leading-tight">
                     {course.title.replace(' Mastery from Scratch', '')}
                   </h3>
                 </div>
 
-                <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+                <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
                   <span>{course.modules.reduce((a, m) => a + m.lessons.length, 0)} Lessons</span>
-                  <span className="font-mono font-semibold text-blue-600">{pts} pts</span>
+                  <span className="font-mono font-semibold text-blue-600 dark:text-blue-400">{pts} pts</span>
                 </div>
               </button>
             );
@@ -231,27 +231,27 @@ export const LearnView: React.FC<LearnViewProps> = ({
       {/* Main Course Curriculum & Lesson Viewer Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Column: Modules & Lessons Navigation (4 cols) */}
-        <div className="lg:col-span-4 bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div className="lg:col-span-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xs space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
             <div>
-              <h3 className="text-sm font-bold text-slate-900">{activeCourse.title}</h3>
-              <p className="text-[11px] text-slate-500 mt-0.5">{activeCourse.tagline}</p>
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white">{activeCourse.title}</h3>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{activeCourse.tagline}</p>
             </div>
           </div>
 
           {/* Track Progress Indicator */}
-          <div className="space-y-1.5 bg-slate-50 p-3 rounded-xl border border-slate-200/70">
+          <div className="space-y-1.5 bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200/70 dark:border-slate-800">
             <div className="flex items-center justify-between text-xs font-semibold">
-              <span className="text-slate-600">Track Progress</span>
-              <span className="font-mono text-blue-600">{courseProgressPercent}%</span>
+              <span className="text-slate-600 dark:text-slate-300">Track Progress</span>
+              <span className="font-mono text-blue-600 dark:text-blue-400">{courseProgressPercent}%</span>
             </div>
-            <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+            <div className="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
               <div
                 className="bg-blue-600 h-full rounded-full transition-all duration-300"
                 style={{ width: `${courseProgressPercent}%` }}
               />
             </div>
-            <p className="text-[10px] text-slate-500">
+            <p className="text-[10px] text-slate-500 dark:text-slate-400">
               {courseLessonsDone} of {courseLessonsTotal} lessons completed
             </p>
           </div>
@@ -260,7 +260,7 @@ export const LearnView: React.FC<LearnViewProps> = ({
           <div className="space-y-4 max-h-[580px] overflow-y-auto pr-1">
             {activeCourse.modules.map((module) => (
               <div key={module.id} className="space-y-1.5">
-                <p className="text-xs font-bold text-slate-800 uppercase tracking-wider px-1">
+                <p className="text-xs font-bold text-slate-800 dark:text-slate-300 uppercase tracking-wider px-1">
                   {module.title}
                 </p>
                 <div className="space-y-1">
@@ -277,21 +277,21 @@ export const LearnView: React.FC<LearnViewProps> = ({
                           isSelected
                             ? 'bg-blue-600 text-white font-semibold shadow-2xs'
                             : isDone
-                            ? 'bg-emerald-50/70 text-emerald-900 hover:bg-emerald-100/70 font-medium'
-                            : 'text-slate-700 hover:bg-slate-100'
+                            ? 'bg-emerald-50/70 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-300 hover:bg-emerald-100/70 dark:hover:bg-emerald-900/50 font-medium'
+                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                         }`}
                       >
                         <div className="flex items-center gap-2 truncate">
                           {isDone ? (
                             <CheckCircle2
                               className={`w-4 h-4 shrink-0 ${
-                                isSelected ? 'text-white' : 'text-emerald-600'
+                                isSelected ? 'text-white' : 'text-emerald-600 dark:text-emerald-400'
                               }`}
                             />
                           ) : (
                             <span
                               className={`w-2 h-2 rounded-full shrink-0 ${
-                                isSelected ? 'bg-white' : 'bg-slate-300'
+                                isSelected ? 'bg-white' : 'bg-slate-300 dark:bg-slate-600'
                               }`}
                             />
                           )}
@@ -300,7 +300,7 @@ export const LearnView: React.FC<LearnViewProps> = ({
 
                         <span
                           className={`text-[10px] shrink-0 font-mono ${
-                            isSelected ? 'text-blue-100' : 'text-slate-400'
+                            isSelected ? 'text-blue-100' : 'text-slate-400 dark:text-slate-500'
                           }`}
                         >
                           {lesson.duration}
@@ -314,7 +314,7 @@ export const LearnView: React.FC<LearnViewProps> = ({
           </div>
 
           {/* Certification Quiz CTA */}
-          <div className="pt-2 border-t border-slate-100">
+          <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
             <button
               type="button"
               onClick={handleLaunchQuiz}
@@ -327,46 +327,46 @@ export const LearnView: React.FC<LearnViewProps> = ({
         </div>
 
         {/* Right Column: Active Lesson Reader & Interactive Lab (8 cols) */}
-        <div className="lg:col-span-8 bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
+        <div className="lg:col-span-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
           {/* Lesson Header */}
-          <div className="border-b border-slate-100 pb-5 space-y-2">
+          <div className="border-b border-slate-100 dark:border-slate-800 pb-5 space-y-2">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
+              <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
                 {currentLessonItem?.moduleTitle || activeCourse.title}
               </span>
 
-              <div className="flex items-center gap-3 text-xs text-slate-500">
+              <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
                 <span className="flex items-center gap-1">
                   <Clock className="w-3.5 h-3.5" />
                   {currentLesson.duration}
                 </span>
                 <span>•</span>
-                <span className="font-semibold text-emerald-600">+25 XP Completion</span>
+                <span className="font-semibold text-emerald-600 dark:text-emerald-400">+25 XP Completion</span>
               </div>
             </div>
 
-            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
               {currentLesson.title}
             </h2>
 
-            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
               {currentLesson.summary}
             </p>
           </div>
 
           {/* Formatted Theory & Concept Markdown Content */}
-          <div className="prose prose-slate max-w-none text-xs sm:text-sm leading-relaxed space-y-4">
+          <div className="prose prose-slate dark:prose-invert max-w-none text-xs sm:text-sm leading-relaxed space-y-4">
             {currentLesson.contentMarkdown.split('\n\n').map((paragraph, idx) => {
               if (paragraph.startsWith('### ')) {
                 return (
-                  <h3 key={idx} className="text-base sm:text-lg font-bold text-slate-900 pt-2">
+                  <h3 key={idx} className="text-base sm:text-lg font-bold text-slate-900 dark:text-white pt-2">
                     {paragraph.replace('### ', '')}
                   </h3>
                 );
               }
               if (paragraph.startsWith('#### ')) {
                 return (
-                  <h4 key={idx} className="text-sm sm:text-base font-bold text-slate-800 pt-1">
+                  <h4 key={idx} className="text-sm sm:text-base font-bold text-slate-800 dark:text-slate-100 pt-1">
                     {paragraph.replace('#### ', '')}
                   </h4>
                 );
@@ -381,7 +381,7 @@ export const LearnView: React.FC<LearnViewProps> = ({
                 );
               }
               return (
-                <p key={idx} className="text-slate-700 leading-relaxed">
+                <p key={idx} className="text-slate-700 dark:text-slate-200 leading-relaxed">
                   {paragraph}
                 </p>
               );
@@ -390,7 +390,7 @@ export const LearnView: React.FC<LearnViewProps> = ({
 
           {/* Live Code Lab Box with Run in Playground Button */}
           {currentLesson.codeExample && (
-            <div className="rounded-2xl border border-slate-200 bg-slate-900 text-slate-100 overflow-hidden shadow-sm">
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-900 text-slate-100 overflow-hidden shadow-sm">
               <div className="px-4 py-2.5 bg-slate-800 border-b border-slate-700 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Code2 className="w-4 h-4 text-blue-400" />
@@ -417,12 +417,12 @@ export const LearnView: React.FC<LearnViewProps> = ({
 
           {/* Key Takeaways */}
           {currentLesson.keyTakeaways && currentLesson.keyTakeaways.length > 0 && (
-            <div className="p-4 rounded-xl bg-amber-50/60 border border-amber-200/80 space-y-2">
-              <div className="flex items-center gap-2 text-xs font-bold text-amber-900 uppercase tracking-wider">
-                <Lightbulb className="w-4 h-4 text-amber-600" />
+            <div className="p-4 rounded-xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/60 space-y-2">
+              <div className="flex items-center gap-2 text-xs font-bold text-amber-900 dark:text-amber-300 uppercase tracking-wider">
+                <Lightbulb className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                 <span>Key Concepts & Takeaways</span>
               </div>
-              <ul className="space-y-1.5 text-xs text-amber-950 pl-5 list-disc">
+              <ul className="space-y-1.5 text-xs text-amber-950 dark:text-amber-200 pl-5 list-disc">
                 {currentLesson.keyTakeaways.map((item, idx) => (
                   <li key={idx} className="leading-relaxed">{item}</li>
                 ))}
@@ -432,13 +432,13 @@ export const LearnView: React.FC<LearnViewProps> = ({
 
           {/* Interactive Checkpoint / Practice Check Question */}
           {currentLesson.practiceCheck && (
-            <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3.5">
-              <div className="flex items-center gap-2 text-xs font-bold text-slate-700 uppercase tracking-wider">
-                <HelpCircle className="w-4 h-4 text-blue-600" />
+            <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-3.5">
+              <div className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                <HelpCircle className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 <span>Quick Comprehension Check</span>
               </div>
 
-              <p className="text-xs sm:text-sm font-semibold text-slate-900">
+              <p className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white">
                 {currentLesson.practiceCheck.question}
               </p>
 
@@ -447,17 +447,17 @@ export const LearnView: React.FC<LearnViewProps> = ({
                   const isSelected = inlineAnswerSelected === idx;
                   const isCorrect = idx === currentLesson.practiceCheck!.correctIndex;
 
-                  let style = 'bg-white border-slate-200 text-slate-800 hover:border-blue-400';
+                  let style = 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 hover:border-blue-400';
                   if (inlineSubmitted) {
                     if (isCorrect) {
-                      style = 'bg-emerald-50 border-emerald-500 text-emerald-900 font-semibold';
+                      style = 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 text-emerald-900 dark:text-emerald-300 font-semibold';
                     } else if (isSelected && !isCorrect) {
-                      style = 'bg-rose-50 border-rose-500 text-rose-900 font-semibold';
+                      style = 'bg-rose-50 dark:bg-rose-950/40 border-rose-500 text-rose-900 dark:text-rose-300 font-semibold';
                     } else {
-                      style = 'bg-slate-100 border-slate-200 text-slate-400';
+                      style = 'bg-slate-100 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500';
                     }
                   } else if (isSelected) {
-                    style = 'bg-blue-50 border-blue-600 text-blue-900 font-medium';
+                    style = 'bg-blue-50 dark:bg-blue-950/40 border-blue-600 text-blue-900 dark:text-blue-200 font-medium';
                   }
 
                   return (
@@ -470,7 +470,7 @@ export const LearnView: React.FC<LearnViewProps> = ({
                     >
                       <span>{opt}</span>
                       {inlineSubmitted && isCorrect && (
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                       )}
                     </button>
                   );
@@ -487,8 +487,8 @@ export const LearnView: React.FC<LearnViewProps> = ({
                   Check Answer
                 </button>
               ) : (
-                <div className="text-xs p-3 rounded-lg bg-white border border-slate-200 text-slate-700">
-                  <p className="font-semibold text-slate-900 mb-0.5">
+                <div className="text-xs p-3 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300">
+                  <p className="font-semibold text-slate-900 dark:text-white mb-0.5">
                     {inlineAnswerSelected === currentLesson.practiceCheck.correctIndex
                       ? '🎯 Spot on!'
                       : '💡 Review:'}
@@ -500,14 +500,14 @@ export const LearnView: React.FC<LearnViewProps> = ({
           )}
 
           {/* Action Footer: Mark Complete, Next Lesson & Certification Quiz */}
-          <div className="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+          <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={handleMarkComplete}
                 className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-colors cursor-pointer ${
                   isCurrentLessonCompleted
-                    ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                    ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
                     : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs'
                 }`}
               >
@@ -521,7 +521,7 @@ export const LearnView: React.FC<LearnViewProps> = ({
                 <button
                   type="button"
                   onClick={() => setActiveLessonId(allLessonsInCourse[activeLessonIndex - 1].lesson.id)}
-                  className="px-3.5 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer"
+                  className="px-3.5 py-2 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-colors cursor-pointer"
                 >
                   Previous
                 </button>

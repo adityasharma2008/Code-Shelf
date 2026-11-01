@@ -130,7 +130,7 @@ export interface LanguageMeta {
   sampleOutput?: ExecutionResult;
 }
 
-export type AchievementCategory = 'creator' | 'learner' | 'community' | 'mastery';
+export type AchievementCategory = 'creator' | 'learner' | 'streak' | 'mastery' | 'community';
 
 export interface Achievement {
   id: string;
@@ -178,6 +178,10 @@ export interface UserStats {
   languagePoints?: Partial<Record<Language, number>>;
   completedLessons?: string[];
   quizzesCompleted?: Record<string, { score: number; total: number; completedAt: string }>;
+  streakSavers?: number;
+  streakSaversUsed?: number;
+  streakBreaksCount?: number;
+  challengesSolvedCount?: number;
 }
 
 export interface QuizQuestion {

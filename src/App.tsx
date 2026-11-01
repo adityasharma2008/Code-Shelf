@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useNavigate, Link } from 'react-router-dom';
 import { Snippet, Language } from './types';
 import { snippetStorage } from './services/snippetStorage';
 import { firebaseService } from './services/firebase';
@@ -19,14 +19,18 @@ import { AdminReportsModal } from './components/AdminReportsModal';
 import { ReportType } from './types';
 
 import { LibraryView } from './views/LibraryView';
+import { HomeDashboardView } from './views/HomeDashboardView';
+import { CommunityView } from './views/CommunityView';
 import { LearnView } from './views/LearnView';
 import { SnippetDetailView } from './views/SnippetDetailView';
 import { PlaygroundView } from './views/PlaygroundView';
 import { SavedView } from './views/SavedView';
 import { MySnippetsView } from './views/MySnippetsView';
 import { ProfileView } from './views/ProfileView';
+import { DailyChallengeView } from './views/DailyChallengeView';
 import { GooglePopupView } from './views/GooglePopupView';
 import { useLocation } from 'react-router-dom';
+import { getInitialTheme, applyTheme } from './utils/theme';
 
 export function AppContent() {
   const navigate = useNavigate();
@@ -55,11 +59,9 @@ export function AppContent() {
     snippetLanguage?: string;
   }>({ type: 'website' });
 
-  // Default clean light theme
+  // Initialize user's preferred light or dark theme
   useEffect(() => {
-    document.documentElement.classList.remove('dark');
-    document.documentElement.classList.add('light');
-    localStorage.setItem('codeshelf_theme', 'light');
+    applyTheme(getInitialTheme());
   }, []);
 
   // Sync snippets when updated in storage or when authentication state changes
@@ -79,6 +81,12 @@ export function AppContent() {
       setIsReportOpen(true);
     };
     const handleOpenAdminReports = () => setIsAdminReportsOpen(true);
+    const handleStreakSaved = () => {
+      showToast('🛡️ Streak Saver Activated! Missed 1 day was automatically protected by your shield.');
+    };
+    const handleStreakBroken = () => {
+      showToast('⚠️ Streak Reset! Inactivity for 2+ consecutive days reset your streak counter.');
+    };
     const handleOpenQuizEvent = (e: any) => {
       if (e?.detail?.language) {
         setQuizLanguage(e.detail.language);
@@ -94,6 +102,8 @@ export function AppContent() {
     window.addEventListener('codeself_open_quiz', handleOpenQuizEvent as EventListener);
     window.addEventListener('codeself_open_report', handleOpenReportEvent as EventListener);
     window.addEventListener('codeself_open_admin_reports', handleOpenAdminReports);
+    window.addEventListener('codeself_streak_saved', handleStreakSaved);
+    window.addEventListener('codeself_streak_broken', handleStreakBroken);
 
     return () => {
       window.removeEventListener('codeshelf_snippets_updated', handleSnippetsUpdated);
@@ -104,6 +114,8 @@ export function AppContent() {
       window.removeEventListener('codeself_open_quiz', handleOpenQuizEvent as EventListener);
       window.removeEventListener('codeself_open_report', handleOpenReportEvent as EventListener);
       window.removeEventListener('codeself_open_admin_reports', handleOpenAdminReports);
+      window.removeEventListener('codeself_streak_saved', handleStreakSaved);
+      window.removeEventListener('codeself_streak_broken', handleStreakBroken);
     };
   }, []);
 
@@ -209,11 +221,31 @@ export function AppContent() {
             <Route
               path="/"
               element={
+                <HomeDashboardView
+                  snippets={snippets}
+                  onOpenSubmit={() => setIsSubmitOpen(true)}
+                  onRequestAuth={(r) => handleOpenAuth(r)}
+                  onToast={showToast}
+                />
+              }
+            />
+            <Route
+              path="/explore"
+              element={
                 <LibraryView
                   snippets={snippets}
                   onToast={showToast}
                   onOpenSubmit={() => setIsSubmitOpen(true)}
-                  onOpenDailyGame={() => setIsGameOpen(true)}
+                  onOpenDailyGame={() => navigate('/challenges')}
+                />
+              }
+            />
+            <Route
+              path="/community"
+              element={
+                <CommunityView
+                  onToast={showToast}
+                  onRequestAuth={(r) => handleOpenAuth(r)}
                 />
               }
             />
@@ -275,15 +307,50 @@ export function AppContent() {
                 />
               }
             />
+            <Route
+              path="/u/:userId"
+              element={
+                <ProfileView
+                  onToast={showToast}
+                  onRequestAuth={(r) => handleOpenAuth(r)}
+                />
+              }
+            />
+            <Route
+              path="/challenges"
+              element={
+                <DailyChallengeView
+                  onToast={showToast}
+                  onRequestAuth={(r) => handleOpenAuth(r)}
+                  onOpenQuiz={(lang) => {
+                    setQuizLanguage(lang);
+                    setIsQuizOpen(true);
+                  }}
+                />
+              }
+            />
+            <Route
+              path="/daily-challenge"
+              element={
+                <DailyChallengeView
+                  onToast={showToast}
+                  onRequestAuth={(r) => handleOpenAuth(r)}
+                  onOpenQuiz={(lang) => {
+                    setQuizLanguage(lang);
+                    setIsQuizOpen(true);
+                  }}
+                />
+              }
+            />
             {/* Fallback route */}
             <Route
               path="*"
               element={
-                <LibraryView
+                <HomeDashboardView
                   snippets={snippets}
-                  onToast={showToast}
                   onOpenSubmit={() => setIsSubmitOpen(true)}
-                  onOpenDailyGame={() => setIsGameOpen(true)}
+                  onRequestAuth={(r) => handleOpenAuth(r)}
+                  onToast={showToast}
                 />
               }
             />
@@ -292,32 +359,32 @@ export function AppContent() {
       </main>
 
       {/* Clean Corporate Footer */}
-      <footer className="border-t border-slate-200 bg-white py-6 text-xs text-slate-500">
+      <footer className="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-6 text-xs text-slate-500 dark:text-slate-400 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">
             <CodeSelfLogo className="w-5 h-5 shrink-0 opacity-90" />
-            <span className="font-semibold text-slate-800">CodeSelf</span>
-            <span className="text-slate-300">·</span>
-            <span>Public Multi-Language Repository & Interactive Hub</span>
+            <span className="font-semibold text-slate-800 dark:text-slate-200">ChulliCode</span>
+            <span className="text-slate-300 dark:text-slate-700">·</span>
+            <span className="text-slate-600 dark:text-slate-400">Learn by building. Share by helping. Grow together.</span>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center sm:justify-end gap-3 sm:gap-4 text-slate-500">
+          <div className="flex flex-wrap items-center justify-center sm:justify-end gap-3 sm:gap-4 text-slate-500 dark:text-slate-400">
             <button
               type="button"
               onClick={() => {
                 setReportConfig({ type: 'website' });
                 setIsReportOpen(true);
               }}
-              className="text-slate-500 hover:text-slate-800 hover:underline transition-colors cursor-pointer"
+              className="hover:text-slate-800 dark:hover:text-slate-200 hover:underline transition-colors cursor-pointer"
             >
               Report Issue / Bug
             </button>
-            <span className="text-slate-300">·</span>
-            <span className="font-medium text-slate-700">
-              Powered by <span className="font-semibold text-blue-600">Chulli Group</span>
-            </span>
-            <span className="text-slate-300">·</span>
-            <span className="font-mono tabular-nums text-slate-400">© 2026 All rights reserved</span>
+            <span className="text-slate-300 dark:text-slate-700">·</span>
+            <Link to="/community" className="hover:text-slate-800 dark:hover:text-slate-200 hover:underline transition-colors">
+              Community
+            </Link>
+            <span className="text-slate-300 dark:text-slate-700">·</span>
+            <span className="font-mono tabular-nums text-slate-400 dark:text-slate-500">© 2026 ChulliCode</span>
           </div>
         </div>
       </footer>
