@@ -1,0 +1,1150 @@
+# ChulliCode — Complete UI Redesign, Advanced Learning Platform, and Secure Admin Control Center
+
+You are acting as a senior product designer, full-stack software architect, frontend engineer, backend engineer, database architect, and learning experience designer.
+
+I own an existing coding platform called ChulliCode, built using Google AI Studio.
+
+I am the platform owner and have an administrator account.
+
+My goal is to transform ChulliCode into a professional, distinctive, production-quality developer learning and community platform.
+
+The platform must support:
+
+1. Learning programming from beginner to advanced.
+2. A chapter-wise, gamified learning experience.
+3. Code sharing and a developer community.
+4. An interactive code playground.
+5. Coding challenges and quizzes.
+6. User profiles and portfolios.
+7. A complete administrator control center.
+
+IMPORTANT:
+
+This is an existing application.
+
+Do not create an entirely separate application.
+
+Do not replace working functionality with static mockups.
+
+Inspect the existing project, preserve working functionality, and implement the changes directly in the existing codebase.
+
+==================================================
+PART 1 — COMPLETE PROFESSIONAL UI REDESIGN
+==================================================
+
+The current UI looks generic and AI-generated.
+
+I want a distinctive, authentic product design.
+
+Do not use a generic SaaS dashboard template.
+
+Do not simply change the colors of the current interface.
+
+Create a cohesive design system specifically for ChulliCode.
+
+DESIGN DIRECTION:
+
+ChulliCode should feel like a combination of:
+
+- A professional developer platform.
+- A modern interactive programming school.
+- A community-driven code repository.
+- A gamified learning application.
+
+The design should be clean, confident, technical, modern, and engaging.
+
+Avoid excessive decoration.
+
+Avoid oversized gradient hero sections.
+
+Avoid repeated card grids everywhere.
+
+Avoid excessive rounded corners.
+
+Avoid unnecessary icons and emojis.
+
+Avoid random gradients.
+
+Avoid generic AI-generated marketing copy.
+
+Avoid excessive empty space.
+
+Use typography, layout, spacing, and real functionality to establish visual quality.
+
+DESIGN SYSTEM:
+
+Primary background: #0B1120
+Secondary background: #111827
+Surface: #172033
+Primary text: #F8FAFC
+Secondary text: #94A3B8
+Accent blue: #3B82F6
+Accent cyan: #06B6D4
+Success: #10B981
+Warning: #F59E0B
+Error: #EF4444
+
+Use a professional typography system such as Inter or Geist.
+
+Create consistent:
+
+- Spacing.
+- Typography scales.
+- Buttons.
+- Inputs.
+- Menus.
+- Dialogs.
+- Navigation.
+- Code editor panels.
+- Empty states.
+- Loading states.
+- Error states.
+
+Use subtle borders and restrained shadows.
+
+Use smaller, more purposeful corner radii.
+
+The interface should look like a product designed by a professional software team.
+
+==================================================
+PART 2 — FIX THE WHITE SIDE MARGINS
+==================================================
+
+The current website has unwanted white areas on both sides.
+
+This must be fixed.
+
+Inspect:
+
+- html
+- body
+- #root
+- application shell
+- page wrappers
+- max-width containers
+- layout backgrounds
+- margins and padding
+- overflow behavior
+- theme variables
+
+The application should occupy the full available viewport width.
+
+Remove unwanted white strips and inconsistent background colors.
+
+Do not solve this by applying arbitrary negative margins.
+
+Use a proper responsive application shell.
+
+Requirements:
+
+- Full-width page background.
+- Consistent background across all routes.
+- No horizontal overflow.
+- No unexplained white margins.
+- No inconsistent theme colors between header and content.
+- Proper responsive behavior.
+- Proper behavior inside the existing Google AI Studio preview.
+
+On desktop, use a well-proportioned content width.
+
+On mobile, use the full available width with appropriate padding.
+
+==================================================
+PART 3 — FIX DARK MODE AND LIGHT MODE
+==================================================
+
+The existing theme toggle is not working properly.
+
+Implement a real, functional theme system.
+
+Requirements:
+
+1. Add a working dark/light mode toggle.
+2. Clicking the toggle must actually change the entire application theme.
+3. Update the header, navigation, cards, forms, editor, dialogs, dropdowns, and footer.
+4. Ensure all routes use the same theme system.
+5. Prevent individual components from hardcoding colors that conflict with the theme.
+6. Use CSS variables or the existing theme architecture.
+7. Persist the user's selected theme.
+8. Restore the selected theme when the application reloads.
+9. Support the system theme as an optional default.
+10. Avoid flashing the wrong theme during initial loading.
+
+If the existing application has theme functionality, fix it instead of creating a conflicting second implementation.
+
+Use a consistent icon and accessible label.
+
+The theme toggle must be fully functional, not decorative.
+
+==================================================
+PART 4 — BRANDING MUST BE PRESERVED
+==================================================
+
+The brand name is ChulliCode.
+
+In the main navigation, the branding must be:
+
+ChulliCode
+Powered by Chulli Tech
+
+The previous branding was changed incorrectly.
+
+Restore:
+
+"Powered by Chulli Tech"
+
+Do not replace it with "Developer Community" or other text.
+
+In the website footer, use:
+
+"Powered by Chulli Groups"
+
+These two branding locations must remain separate and exact.
+
+The footer should include appropriate links such as:
+
+- About.
+- Community Guidelines.
+- Privacy Policy.
+- Terms of Service.
+- Contact.
+- Report a Bug.
+
+Do not invent company details, contact information, or legal claims.
+
+==================================================
+PART 5 — REDESIGN THE MAIN DASHBOARD
+==================================================
+
+The dashboard should be useful, not decorative.
+
+Remove the oversized dashboard banner and unnecessary repeated cards.
+
+Create a professional coding workspace dashboard.
+
+The dashboard should contain:
+
+- Welcome message.
+- Continue Learning.
+- Your Learning Progress.
+- Today's Coding Challenge.
+- Recent Code Submissions.
+- Bookmarked Code.
+- Coding Streak.
+- XP and Level.
+- Recent Discussions.
+- Quick Actions.
+
+Prioritize the most important action for the user.
+
+The dashboard must adapt to actual user activity.
+
+Do not generate fake progress, fake bookmarks, fake XP, or fake submissions.
+
+If a user has not started learning, show a useful onboarding state.
+
+Do not automatically activate a course.
+
+The user should choose a course from the Learn page.
+
+==================================================
+PART 6 — COMPLETE LEARNING PLATFORM
+==================================================
+
+This is one of the most important requirements.
+
+The current learning system is too small.
+
+It contains only a few modules and topics, after which the course ends.
+
+I want a complete, structured programming curriculum from absolute beginner to advanced.
+
+The learning experience should be engaging, gamified, chapter-wise, and suitable for:
+
+- School students.
+- College students.
+- Beginners.
+- Self-taught developers.
+- Users preparing for internships.
+- Users preparing for technical interviews.
+
+The learning system must teach concepts thoroughly.
+
+Do not create only a few lessons with short explanations.
+
+Do not consider a language mastered after three modules.
+
+Do not create only ten quizzes for an entire programming language.
+
+Build a scalable learning architecture that supports many modules, chapters, lessons, exercises, and assessments.
+
+==================================================
+PART 7 — LEARN PAGE AND LANGUAGE SELECTION
+==================================================
+
+When a user clicks Learn:
+
+Show a professional Learning Hub.
+
+Do not automatically open or activate a programming language.
+
+Do not automatically enroll users in a course.
+
+The user must be able to choose a language.
+
+Create a language selection interface.
+
+Initial programming tracks:
+
+- Python.
+- C++.
+- Java.
+- JavaScript.
+- TypeScript.
+- SQL.
+- C.
+- C#.
+- HTML and CSS.
+- PHP.
+
+Additional languages can be added later.
+
+Each language should have:
+
+- Beginner curriculum.
+- Intermediate curriculum.
+- Advanced curriculum.
+- Course overview.
+- Estimated learning time.
+- Chapter count.
+- Lesson count.
+- Prerequisites.
+- Learning objectives.
+- Completion progress.
+
+The user can choose a language and start from the beginning or resume an existing course.
+
+Do not make a language appear active before the user selects it.
+
+Allow users to switch languages without losing their progress.
+
+==================================================
+PART 8 — COMPLETE PYTHON CURRICULUM
+==================================================
+
+Create a comprehensive Python curriculum.
+
+Python must be the first complete example of the new learning architecture.
+
+The Python curriculum must contain the following levels.
+
+LEVEL 1 — PYTHON FOUNDATIONS
+
+Chapters:
+
+1. Introduction to Programming and Python.
+2. Installing Python and Setting Up the Environment.
+3. Python Syntax and Indentation.
+4. Variables and Naming Conventions.
+5. Data Types.
+6. Type Conversion.
+7. Input and Output.
+8. Operators.
+9. Expressions and Evaluation.
+10. Comments and Documentation.
+
+LEVEL 2 — CONTROL FLOW
+
+Chapters:
+
+1. Boolean Logic.
+2. Conditional Statements.
+3. Nested Conditions.
+4. For Loops.
+5. While Loops.
+6. Loop Control.
+7. Nested Loops.
+8. Pattern Printing.
+9. Basic Problem Solving.
+10. Control Flow Practice Lab.
+
+LEVEL 3 — PYTHON DATA STRUCTURES
+
+Chapters:
+
+1. Strings.
+2. String Indexing and Slicing.
+3. String Methods.
+4. Lists.
+5. List Methods.
+6. List Comprehensions.
+7. Tuples.
+8. Sets.
+9. Dictionaries.
+10. Dictionary Comprehensions.
+11. Nested Data Structures.
+12. Data Structure Problem Solving.
+
+LEVEL 4 — FUNCTIONS
+
+Chapters:
+
+1. Defining Functions.
+2. Parameters and Arguments.
+3. Return Values.
+4. Scope.
+5. Default Arguments.
+6. Keyword Arguments.
+7. *args and **kwargs.
+8. Lambda Functions.
+9. Higher-Order Functions.
+10. Recursion.
+11. Function Design.
+12. Function Practice Lab.
+
+LEVEL 5 — OBJECT-ORIENTED PROGRAMMING
+
+Chapters:
+
+1. Classes and Objects.
+2. Constructors.
+3. Instance and Class Attributes.
+4. Methods.
+5. Encapsulation.
+6. Inheritance.
+7. Polymorphism.
+8. Abstraction.
+9. Composition.
+10. Special Methods.
+11. Properties.
+12. OOP Project.
+
+LEVEL 6 — INTERMEDIATE PYTHON
+
+Chapters:
+
+1. Iterators.
+2. Generators.
+3. Decorators.
+4. Closures.
+5. Context Managers.
+6. Exception Handling.
+7. Custom Exceptions.
+8. Modules.
+9. Packages.
+10. Virtual Environments.
+11. Dependency Management.
+12. Intermediate Practice Lab.
+
+LEVEL 7 — FILES AND DATA
+
+Chapters:
+
+1. File Handling.
+2. Reading and Writing Files.
+3. Working with CSV.
+4. JSON.
+5. Serialization.
+6. Working with Paths.
+7. Dates and Times.
+8. Regular Expressions.
+9. Data Processing.
+10. File Processing Project.
+
+LEVEL 8 — ALGORITHMS AND DATA STRUCTURES
+
+Chapters:
+
+1. Time Complexity.
+2. Space Complexity.
+3. Big O Notation.
+4. Linear Search.
+5. Binary Search.
+6. Sorting Algorithms.
+7. Stacks.
+8. Queues.
+9. Linked Lists.
+10. Hash Tables.
+11. Trees.
+12. Graphs.
+13. Recursion and Backtracking.
+14. Dynamic Programming.
+15. Algorithm Practice Lab.
+
+LEVEL 9 — ADVANCED PYTHON CONCEPTS
+
+Chapters:
+
+1. Advanced Decorators.
+2. Advanced Generators.
+3. Type Hints.
+4. Static Type Checking.
+5. Dataclasses.
+6. Advanced OOP.
+7. Metaclasses Introduction.
+8. Memory Management.
+9. Python Internals.
+10. Performance Optimization.
+11. Profiling.
+12. Advanced Practice Lab.
+
+LEVEL 10 — PRACTICAL PYTHON DEVELOPMENT
+
+Chapters:
+
+1. Project Structure.
+2. Writing Maintainable Code.
+3. Unit Testing.
+4. Test-Driven Development.
+5. Logging.
+6. Debugging.
+7. API Fundamentals.
+8. Working with HTTP APIs.
+9. Database Fundamentals.
+10. SQLite and Python.
+11. Git and GitHub Basics.
+12. Deployment Fundamentals.
+13. Building a Command-Line Application.
+14. Building a Complete Python Project.
+
+This is the minimum structure for Python.
+
+Add more chapters where necessary.
+
+Do not create empty chapters merely to increase chapter counts.
+
+Every chapter must contain real educational content.
+
+==================================================
+PART 9 — OTHER PROGRAMMING LANGUAGES
+==================================================
+
+Use the same scalable learning architecture for the other programming tracks.
+
+C++:
+
+- Syntax and Fundamentals.
+- Variables and Data Types.
+- Operators.
+- Conditions and Loops.
+- Functions.
+- Arrays and Strings.
+- Pointers and References.
+- Memory Management.
+- Object-Oriented Programming.
+- STL.
+- Templates.
+- Data Structures.
+- Algorithms.
+- Modern C++ Features.
+- Exception Handling.
+- File Handling.
+- Testing and Debugging.
+- Advanced Projects.
+
+Java:
+
+- Syntax and Fundamentals.
+- Variables and Types.
+- Conditions and Loops.
+- Methods.
+- Arrays and Strings.
+- Classes and Objects.
+- Inheritance.
+- Interfaces.
+- Polymorphism.
+- Collections Framework.
+- Generics.
+- Exception Handling.
+- File Handling.
+- Streams.
+- Lambda Expressions.
+- Multithreading.
+- JVM Fundamentals.
+- Testing.
+- Database Connectivity.
+- Projects.
+
+JavaScript:
+
+- Fundamentals.
+- Variables and Types.
+- Operators.
+- Conditions and Loops.
+- Functions.
+- Arrays.
+- Objects.
+- DOM.
+- Events.
+- Modern JavaScript.
+- Modules.
+- Promises.
+- Async/Await.
+- Error Handling.
+- Fetch API.
+- Browser Storage.
+- Functional Programming.
+- Advanced JavaScript.
+- Testing.
+- Projects.
+
+SQL:
+
+- Database Fundamentals.
+- Tables and Relationships.
+- SELECT.
+- Filtering.
+- Sorting.
+- Aggregate Functions.
+- GROUP BY.
+- HAVING.
+- Joins.
+- Subqueries.
+- Common Table Expressions.
+- Window Functions.
+- Indexes.
+- Transactions.
+- Normalization.
+- Query Optimization.
+- Database Design.
+- Projects.
+
+TypeScript:
+
+- JavaScript Prerequisites.
+- Type System.
+- Basic Types.
+- Functions.
+- Interfaces.
+- Type Aliases.
+- Generics.
+- Classes.
+- Utility Types.
+- Type Narrowing.
+- Advanced Types.
+- Modules.
+- Error Handling.
+- TypeScript Projects.
+
+HTML/CSS:
+
+- HTML Structure.
+- Semantic HTML.
+- Forms.
+- Accessibility.
+- CSS Fundamentals.
+- Selectors.
+- Box Model.
+- Flexbox.
+- Grid.
+- Responsive Design.
+- Animations.
+- Modern CSS.
+- UI Projects.
+
+The remaining tracks should follow the same structured curriculum model.
+
+Create meaningful, progressive learning paths.
+
+==================================================
+PART 10 — GAMIFIED LEARNING EXPERIENCE
+==================================================
+
+Make the learning experience feel like an interactive coding game.
+
+The user should feel excited to unlock the next lesson.
+
+Create:
+
+- Learning levels.
+- Chapter progression.
+- XP rewards.
+- Skill badges.
+- Knowledge checkpoints.
+- Interactive coding exercises.
+- Lesson completion.
+- Chapter completion.
+- Course completion.
+- Optional daily goals.
+- Learning streaks.
+- Progress maps.
+- Unlockable chapters.
+- Achievement notifications.
+
+Use a professional game-inspired interface.
+
+Do not make the entire application look like a children's game.
+
+The design should be exciting but still appropriate for college students and professional learners.
+
+LEARNING MAP:
+
+Display chapters as a progression path.
+
+Example:
+
+Level 1: Python Foundations
+
+Chapter 1: Your First Program
+Chapter 2: Variables
+Chapter 3: Data Types
+Chapter 4: Input and Output
+Chapter 5: Operators
+
+Each chapter can contain multiple lessons.
+
+The next chapter should unlock when the user satisfies the defined completion criteria.
+
+Allow users to revisit completed chapters.
+
+Do not permanently lock previously completed educational content.
+
+Show clear progress indicators.
+
+==================================================
+PART 11 — LESSON STRUCTURE
+==================================================
+
+Every lesson must contain:
+
+1. Lesson title.
+2. Learning objectives.
+3. Estimated time.
+4. Beginner-friendly theory.
+5. Real-world explanation.
+6. Code examples.
+7. Syntax-highlighted code.
+8. Interactive practice.
+9. A small knowledge check.
+10. A challenge.
+11. A clear completion action.
+12. A next lesson recommendation.
+
+Use simple language.
+
+Explain why a concept matters.
+
+Explain common mistakes.
+
+Include practical examples.
+
+Avoid overly short explanations.
+
+Do not simply display a paragraph and mark it as a completed lesson.
+
+Provide actual learning value.
+
+==================================================
+PART 12 — QUIZZES AND ASSESSMENTS
+==================================================
+
+The current quiz system is too small.
+
+Build a scalable assessment system.
+
+Support:
+
+- Multiple-choice questions.
+- Multiple-select questions.
+- Code output prediction.
+- Find-the-error questions.
+- Fill-in-the-blank.
+- Code writing exercises.
+- Matching concepts.
+- Short-answer questions.
+
+Every chapter should have a knowledge check.
+
+Every module should have a larger assessment.
+
+Every level should have a milestone assessment.
+
+Every course should have a final assessment.
+
+Use a question bank with multiple questions.
+
+Do not create only ten questions for an entire programming course.
+
+The number of questions should depend on the actual course content.
+
+Provide:
+
+- Correct answer.
+- Explanation.
+- Incorrect answer feedback.
+- Retry functionality.
+- Score.
+- Progress.
+- Review mode.
+
+Do not award points for incorrect answers.
+
+Avoid repeating the same question unnecessarily.
+
+==================================================
+PART 13 — ADMIN CONTROL CENTER
+==================================================
+
+This is a critical feature.
+
+I own ChulliCode and have an administrator account.
+
+Currently, I can see reported content through an icon.
+
+I want a complete, dedicated Admin Control Center.
+
+Create an admin shield or management icon in the main navigation.
+
+Only authenticated administrators should see this icon.
+
+When the administrator clicks it, open a dedicated admin dashboard.
+
+Do not display admin navigation to normal users.
+
+Do not rely on hiding frontend buttons for security.
+
+All administrative operations must be protected by backend authorization.
+
+ADMIN DASHBOARD:
+
+Create a professional administration interface with:
+
+- Overview.
+- User Management.
+- Code Repository Management.
+- Discussion Management.
+- Comment Management.
+- Report Management.
+- Learning Content Management.
+- Course Management.
+- Quiz Management.
+- Challenge Management.
+- Leaderboard Management.
+- Activity Audit Log.
+- Platform Settings.
+
+==================================================
+PART 14 — ADMIN USER MANAGEMENT
+==================================================
+
+The admin should be able to:
+
+- View registered users.
+- Search users.
+- Filter users.
+- View user profiles.
+- View user activity.
+- View published snippets.
+- View discussions.
+- View reported content.
+- Suspend users.
+- Restore suspended users.
+- Restrict posting permissions.
+- Review user reports.
+- Remove inappropriate content.
+- Delete user accounts when legally and technically appropriate.
+
+Account deletion must be protected by a confirmation dialog.
+
+Use soft deletion where appropriate.
+
+Preserve necessary audit records.
+
+Do not allow an administrator to accidentally delete their own administrator account.
+
+Do not expose passwords, private authentication tokens, or sensitive account information.
+
+==================================================
+PART 15 — ADMIN CODE MANAGEMENT
+==================================================
+
+Create a dedicated code moderation page.
+
+The admin should be able to:
+
+- Browse all published snippets.
+- Search by title.
+- Search by language.
+- Search by author.
+- Filter by date.
+- Filter by visibility.
+- View full code content.
+- View code reports.
+- Unpublish a snippet.
+- Restore a snippet.
+- Remove inappropriate snippets.
+- Review suspicious submissions.
+- View snippet ownership.
+- Inspect submission metadata.
+
+Deleting or unpublishing code must require an appropriate confirmation.
+
+The admin must be able to moderate content without impersonating the author.
+
+==================================================
+PART 16 — ADMIN COMMUNITY MANAGEMENT
+==================================================
+
+Create a discussion moderation dashboard.
+
+Admin capabilities:
+
+- View all discussions.
+- Search discussions.
+- View replies.
+- View reports.
+- Remove inappropriate replies.
+- Lock discussions.
+- Unlock discussions.
+- Mark content for moderation.
+- Resolve reports.
+- Review spam.
+- Review abusive content.
+- Suspend repeat offenders.
+
+Do not automatically generate discussion content.
+
+Do not generate fake replies.
+
+Do not generate fake likes.
+
+Do not generate fake community activity.
+
+==================================================
+PART 17 — ADMIN LEARNING CONTENT MANAGEMENT
+==================================================
+
+The admin should be able to manage the entire learning system.
+
+Create an admin course management interface.
+
+Admin capabilities:
+
+- Create a programming track.
+- Edit a programming track.
+- Create a course.
+- Edit a course.
+- Create modules.
+- Edit modules.
+- Create chapters.
+- Reorder chapters.
+- Create lessons.
+- Edit lesson theory.
+- Add code examples.
+- Add practice exercises.
+- Create quizzes.
+- Add assessment questions.
+- Configure XP rewards.
+- Configure chapter unlocking.
+- Publish courses.
+- Unpublish courses.
+- Preview courses before publishing.
+- Archive outdated courses.
+
+The admin should be able to organize courses in a clear hierarchy:
+
+Programming Language
+→ Course
+→ Level
+→ Module
+→ Chapter
+→ Lesson
+→ Exercise
+→ Quiz
+
+Allow drag-and-drop ordering where appropriate.
+
+Course content must be saved to the real database.
+
+Do not create fake student enrollment records.
+
+Do not create fake course completion statistics.
+
+==================================================
+PART 18 — ADMIN ACTIVITY AND AUDIT LOG
+==================================================
+
+Create an administrative activity page.
+
+Track legitimate actions such as:
+
+- User registration.
+- Code submission.
+- Code publication.
+- Discussion creation.
+- Reply creation.
+- Content reporting.
+- Moderation actions.
+- Course publication.
+- Account suspension.
+- Account deletion.
+
+The activity log must be based on actual backend events.
+
+Never invent activity timestamps.
+
+Never generate fake activity to populate the admin dashboard.
+
+==================================================
+PART 19 — ADMIN SECURITY
+==================================================
+
+Use a secure role-based authorization system.
+
+Possible roles:
+
+- Student.
+- Contributor.
+- Moderator.
+- Administrator.
+
+Only the actual authorized administrator can access administrative functions.
+
+Use the existing authentication system.
+
+Do not hardcode admin credentials.
+
+Do not identify the administrator solely by a display name or email address in frontend code.
+
+Use a trusted server-side role or verified authorization claim.
+
+Protect administrative database operations.
+
+Prevent privilege escalation.
+
+Prevent users from modifying their own roles.
+
+Prevent users from calling administrative endpoints directly.
+
+Use audit logging for sensitive operations.
+
+If the existing backend does not support roles, implement a secure authorization approach appropriate to the current architecture.
+
+Do not create a fake admin interface that only looks functional.
+
+==================================================
+PART 20 — FOOTER AND FINAL POLISH
+==================================================
+
+Create a clean professional footer.
+
+Use the exact branding:
+
+Powered by Chulli Groups
+
+Include relevant navigation links.
+
+Ensure the footer matches the current theme.
+
+Do not create unnecessary decorative sections.
+
+Fix:
+
+- Responsive issues.
+- Inconsistent spacing.
+- Broken routes.
+- Theme conflicts.
+- Incorrect background colors.
+- Unresponsive controls.
+- Loading issues.
+- Empty state issues.
+- Unnecessary white margins.
+
+==================================================
+PART 21 — IMPLEMENTATION PROCESS
+==================================================
+
+Do not implement all features as disconnected mockups.
+
+First inspect the existing application.
+
+Identify the current:
+
+- Framework.
+- Routes.
+- Components.
+- Database.
+- Authentication.
+- User roles.
+- Code execution backend.
+- Learning system.
+- Theme system.
+- Admin capabilities.
+
+Then implement in phases.
+
+PHASE 1:
+
+- Fix full-width layout.
+- Remove unwanted white margins.
+- Create the new design system.
+- Fix dark and light mode.
+- Restore branding.
+- Redesign the dashboard.
+- Improve navigation.
+
+PHASE 2:
+
+- Build the Learning Hub.
+- Implement language selection.
+- Implement the chapter-wise learning architecture.
+- Create the Python curriculum.
+- Create lesson progression.
+- Add gamification.
+
+PHASE 3:
+
+- Expand other programming tracks.
+- Add quizzes and assessments.
+- Add chapter unlock logic.
+- Add learning progress persistence.
+
+PHASE 4:
+
+- Create the dedicated Admin Control Center.
+- Implement user management.
+- Implement code moderation.
+- Implement discussion moderation.
+- Implement course management.
+- Implement secure authorization.
+- Implement audit logs.
+
+PHASE 5:
+
+- Test all routes.
+- Test all user roles.
+- Test dark and light mode.
+- Test mobile layouts.
+- Test empty states.
+- Test database persistence.
+- Test admin permissions.
+- Test course progression.
+- Test all major actions.
+
+Do not stop after describing the architecture.
+
+Implement the changes in the existing application.
+
+If the project requires multiple implementation steps, complete the highest-priority phase first and continue with the remaining phases.
+
+Do not introduce fake data.
+
+Do not create fake users.
+
+Do not create fake course enrollment.
+
+Do not create fake community activity.
+
+Do not claim that a feature works if it has not been implemented and tested.
+
+FINAL PRODUCT GOAL:
+
+ChulliCode must feel like a distinctive, professional coding education and developer community platform.
+
+Its learning system must be comprehensive, chapter-wise, interactive, and gamified.
+
+Its administrator must have a secure and powerful control center.
+
+Its UI must be polished, responsive, and visually consistent.
+
+It must not look like a generic AI-generated website.

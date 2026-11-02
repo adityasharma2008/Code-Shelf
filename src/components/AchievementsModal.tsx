@@ -428,8 +428,8 @@ export const AchievementsModal: React.FC<AchievementsModalProps> = ({
 
               {realLeaderboard.length === 0 ? (
                 <div className="p-8 text-center bg-slate-50 border border-slate-200 rounded-xl text-slate-500 text-xs">
-                  <p className="font-semibold text-slate-700">No contributors on the leaderboard yet.</p>
-                  <p className="mt-1">Publish a code snippet or solve today's challenge to take the #1 spot!</p>
+                  <p className="font-semibold text-slate-700">No leaderboard entries yet.</p>
+                  <p className="mt-1">Complete a lesson or solve a coding challenge to earn your first XP.</p>
                 </div>
               ) : (
                 <div className="border border-slate-200 rounded-xl overflow-hidden divide-y divide-slate-100">

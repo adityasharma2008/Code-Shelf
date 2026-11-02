@@ -86,18 +86,22 @@ export const SavedView: React.FC<SavedViewProps> = ({ snippets, onToast }) => {
           ))}
         </div>
       ) : (
-        <div className="py-16 text-center rounded-xl bg-white border border-slate-200 shadow-xs max-w-lg mx-auto p-6">
-          <Bookmark className="w-10 h-10 text-slate-400 mx-auto mb-2" />
-          <h3 className="text-base font-semibold text-slate-900">No bookmarked snippets yet</h3>
-          <p className="mt-1 text-xs text-slate-500 max-w-sm mx-auto">
-            Click the bookmark icon on any snippet card in the library to save it here for fast reference.
+        <div className="py-16 text-center rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs max-w-lg mx-auto p-8">
+          <div className="w-12 h-12 bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mx-auto mb-3">
+            <Bookmark className="w-6 h-6" />
+          </div>
+          <h3 className="text-base font-bold text-slate-900 dark:text-white">
+            Your bookmarks will appear here when you save useful code.
+          </h3>
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto leading-relaxed">
+            Browse verified algorithms and snippets in the repository, then click the bookmark icon to save them for quick reference.
           </p>
           <Link
-            to="/"
-            className="inline-flex items-center gap-2 mt-5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition-colors shadow-xs"
+            to="/explore"
+            className="inline-flex items-center gap-2 mt-5 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold rounded-xl transition-colors shadow-xs"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Browse Library</span>
+            <span>Explore Code</span>
           </Link>
         </div>
       )}

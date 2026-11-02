@@ -185,5 +185,50 @@ service cloud.firestore {
         incoming().description is string && incoming().description.size() > 0 && incoming().description.size() <= 3000;
       allow update, delete: if isValidId(reportId) && isAdmin();
     }
+
+    // Community Discussions
+    match /discussions/{discId} {
+      allow get, list: if true;
+      allow create: if isVerifiedUser() &&
+        isValidId(discId) &&
+        incoming().id == discId &&
+        incoming().authorId == request.auth.uid;
+      allow update: if isValidId(discId) && (
+        isAdmin() ||
+        (isVerifiedUser() && existing().authorId == request.auth.uid) ||
+        incoming().diff(existing()).affectedKeys().hasOnly(['upvotes', 'upvotedBy', 'repliesCount', 'isSolved'])
+      );
+      allow delete: if isValidId(discId) && (isAdmin() || (isVerifiedUser() && existing().authorId == request.auth.uid));
+    }
+
+    // Discussion Replies
+    match /discussion_replies/{replyId} {
+      allow get, list: if true;
+      allow create: if isVerifiedUser() &&
+        isValidId(replyId) &&
+        incoming().id == replyId &&
+        incoming().authorId == request.auth.uid;
+      allow update: if isValidId(replyId) && (
+        isAdmin() ||
+        (isVerifiedUser() && existing().authorId == request.auth.uid) ||
+        incoming().diff(existing()).affectedKeys().hasOnly(['upvotes', 'upvotedBy', 'isAcceptedAnswer'])
+      );
+      allow delete: if isValidId(replyId) && (isAdmin() || (isVerifiedUser() && existing().authorId == request.auth.uid));
+    }
+
+    // Snippet Comments
+    match /comments/{commentId} {
+      allow get, list: if true;
+      allow create: if isVerifiedUser() &&
+        isValidId(commentId) &&
+        incoming().id == commentId &&
+        incoming().authorId == request.auth.uid;
+      allow update: if isValidId(commentId) && (
+        isAdmin() ||
+        (isVerifiedUser() && existing().authorId == request.auth.uid) ||
+        incoming().diff(existing()).affectedKeys().hasOnly(['upvotes', 'upvotedBy'])
+      );
+      allow delete: if isValidId(commentId) && (isAdmin() || (isVerifiedUser() && existing().authorId == request.auth.uid));
+    }
   }
 }

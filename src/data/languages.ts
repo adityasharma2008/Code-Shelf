@@ -188,6 +188,46 @@ Result: Passed with Distinction`,
       status: 'success'
     }
   },
+  c: {
+    id: 'c',
+    name: 'C',
+    extension: 'c',
+    mimeType: 'text/x-csrc',
+    pistonLanguage: 'c',
+    version: '10.2.0',
+    color: 'text-sky-700',
+    bgLight: 'bg-sky-50 text-sky-800 border-sky-200',
+    bgDark: 'bg-sky-950/60 text-sky-200 border-sky-800',
+    sampleBoilerplate: `// C - Pointer arithmetic & Sum of Array
+#include <stdio.h>
+
+int main() {
+    int arr[] = {10, 20, 30, 40, 50};
+    int n = sizeof(arr) / sizeof(arr[0]);
+    int sum = 0;
+
+    printf("Array elements: ");
+    for (int i = 0; i < n; i++) {
+        printf("%d ", *(arr + i));
+        sum += *(arr + i);
+    }
+    printf("\\nTotal Sum = %d\\n", sum);
+    return 0;
+}
+`,
+    keywords: [
+        '#include', 'int', 'char', 'float', 'double', 'void', 'long', 'short', 'unsigned', 'signed',
+        'struct', 'union', 'enum', 'typedef', 'sizeof', 'static', 'extern', 'const', 'volatile',
+        'auto', 'register', 'return', 'if', 'else', 'for', 'while', 'do', 'switch', 'case', 'break',
+        'continue', 'goto', 'printf', 'scanf', 'malloc', 'free', 'NULL'
+    ],
+    sampleOutput: {
+        stdout: `Array elements: 10 20 30 40 50 
+Total Sum = 150`,
+        executionTimeMs: 18,
+        status: 'success'
+    }
+  },
   cpp: {
     id: 'cpp',
     name: 'C++',

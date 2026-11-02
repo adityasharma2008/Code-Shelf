@@ -451,7 +451,7 @@ export const TeamWorkspaceModal: React.FC<TeamWorkspaceModalProps> = ({
                   type="text"
                   value={joinMemberName}
                   onChange={(e) => setJoinMemberName(e.target.value)}
-                  placeholder="e.g. Rahul Sharma"
+                  placeholder="e.g. Alex Chen"
                   className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                   required
                 />

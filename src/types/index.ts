@@ -1,5 +1,6 @@
 export type Language = 
   | 'cpp'
+  | 'c'
   | 'python'
   | 'java'
   | 'javascript'
@@ -295,5 +296,101 @@ export interface CodingGameChallenge {
   scrambledLines?: string[];
   correctOrder?: number[];
   pointsReward: number;
+}
+
+export interface ChapterLesson {
+  id: string;
+  chapterId: string;
+  title: string;
+  duration: string;
+  summary: string;
+  learningObjectives: string[];
+  contentMarkdown: string;
+  realWorldContext: string;
+  codeExample: string;
+  codeLanguage: Language;
+  keyTakeaways: string[];
+  interactivePractice: {
+    instructions: string;
+    starterCode: string;
+    solutionCode: string;
+    expectedOutput?: string;
+  };
+  knowledgeCheck: {
+    question: string;
+    options: string[];
+    correctIndex: number;
+    explanation: string;
+  };
+  challenge: {
+    title: string;
+    task: string;
+    hint: string;
+  };
+}
+
+export interface CurriculumChapter {
+  id: string;
+  number: number;
+  title: string;
+  description: string;
+  levelNumber: number;
+  levelTitle: string;
+  estimatedMinutes: number;
+  lessons: ChapterLesson[];
+  assessmentQuestions?: QuizQuestion[];
+  unlockedByDefault?: boolean;
+}
+
+export interface CurriculumLevel {
+  levelNumber: number;
+  title: string;
+  description: string;
+  chapters: CurriculumChapter[];
+}
+
+export interface LearningTrack {
+  id: string;
+  language: Language;
+  name: string;
+  tagline: string;
+  category: 'Systems & Backend' | 'Web & Frontend' | 'Database' | 'Scripting';
+  description: string;
+  levelsCount: number;
+  chaptersCount: number;
+  lessonsCount: number;
+  estimatedHours: string;
+  prerequisites: string[];
+  learningObjectives: string[];
+  icon: string;
+  color: string;
+  badge: string;
+  levels: CurriculumLevel[];
+}
+
+export interface UserLearningProgress {
+  activeTrackId?: string;
+  completedLessons: string[];
+  unlockedChapters: string[];
+  chapterQuizScores: Record<string, number>;
+  trackProgress: Record<string, {
+    completedLessons: number;
+    totalLessons: number;
+    percent: number;
+    lastActiveChapterId?: string;
+    lastActiveLessonId?: string;
+    lastStudiedAt: string;
+  }>;
+}
+
+export interface AdminAuditLogEntry {
+  id: string;
+  action: string;
+  actorEmail: string;
+  targetType: 'user' | 'snippet' | 'discussion' | 'reply' | 'report' | 'course' | 'setting';
+  targetId?: string;
+  targetTitle?: string;
+  details: string;
+  timestamp: string;
 }
 

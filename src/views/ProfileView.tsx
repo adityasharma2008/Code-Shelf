@@ -21,7 +21,7 @@ interface ProfileViewProps {
 }
 
 const PRESET_AVATARS = [
-  'https://api.dicebear.com/7.x/bottts/svg?seed=Aarav',
+  'https://api.dicebear.com/7.x/bottts/svg?seed=PixelDev',
   'https://api.dicebear.com/7.x/bottts/svg?seed=CodeHero',
   'https://api.dicebear.com/7.x/bottts/svg?seed=DevPro',
   'https://api.dicebear.com/7.x/bottts/svg?seed=ByteCoder',
@@ -954,16 +954,25 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onToast, onRequestAuth
         </div>
 
         {visibleSnippets.length === 0 ? (
-          <div className="py-8 text-center text-slate-400">
-            <p className="text-xs text-slate-500">No snippets found in this filter.</p>
-            <button
-              type="button"
-              onClick={() => setIsWritingCode(true)}
-              className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:underline cursor-pointer"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Write your first code now</span>
-            </button>
+          <div className="py-10 text-center text-slate-400">
+            <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+              This developer hasn't published any snippets yet.
+            </p>
+            {isOwnProfile && (
+              <>
+                <p className="text-xs text-slate-500 mt-1">
+                  Publish an algorithm or create a private draft directly in your developer studio.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setIsWritingCode(true)}
+                  className="mt-3 inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl shadow-xs transition-colors cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Write your first code now</span>
+                </button>
+              </>
+            )}
           </div>
         ) : (
           <div className="divide-y divide-slate-100">

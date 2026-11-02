@@ -7,7 +7,7 @@ import {
   Plus, Bookmark, Code2, LogIn, LogOut, FolderCode, 
   Users, Flame, Trophy, ShieldAlert, Flag, Sparkles, 
   User as UserIcon, Sun, Moon, Menu, X, BookOpen, 
-  Terminal, MessageSquare, Compass, ShieldCheck
+  Terminal, MessageSquare, Compass, ShieldCheck, Settings
 } from 'lucide-react';
 import { CodeSelfLogo } from './CodeSelfLogo';
 import { gamificationService } from '../services/gamificationService';
@@ -114,9 +114,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     { to: '/explore', label: 'Explore Code' },
     { to: '/learn', label: 'Learn' },
     { to: '/playground', label: 'Playground' },
-    { to: '/challenges', label: 'Challenges' },
     { to: '/community', label: 'Community' },
-    { to: '/saved', label: 'Bookmarks' }
   ];
 
   return (
@@ -130,12 +128,12 @@ export const Navbar: React.FC<NavbarProps> = ({
             className="flex items-center gap-2.5 text-slate-900 dark:text-white whitespace-nowrap shrink-0 group py-1"
           >
             <CodeSelfLogo className="w-8 h-8 shrink-0 transition-transform duration-200 group-hover:scale-105" />
-            <div className="flex flex-col text-left leading-none">
+            <div className="flex flex-col justify-center leading-none">
               <span className="text-base sm:text-lg font-bold tracking-tight text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors">
                 ChulliCode
               </span>
-              <span className="text-[10px] font-medium tracking-wide text-slate-500 dark:text-slate-400 mt-1 hidden sm:block">
-                Developer Community
+              <span className="text-[11px] font-medium tracking-normal text-slate-500 dark:text-slate-400 mt-0.5">
+                Powered by Chulli Tech
               </span>
             </div>
           </Link>
@@ -178,37 +176,33 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
           </button>
 
-          {/* Rewards & Daily Streak Button */}
-          {onOpenAchievements && (
-            <button
-              type="button"
-              onClick={onOpenAchievements}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-amber-900 dark:text-amber-200 bg-amber-50 dark:bg-amber-950/60 hover:bg-amber-100 dark:hover:bg-amber-900/60 border border-amber-200/90 dark:border-amber-800 rounded-xl transition-colors shadow-2xs cursor-pointer whitespace-nowrap shrink-0 group"
-              title={`Level ${levelInfo.level}: ${levelInfo.title} • ${userStats?.xp ?? 0} XP • Click to open Badges & Achievements`}
-            >
-              <Flame className="w-3.5 h-3.5 text-orange-500 fill-orange-500 group-hover:scale-110 transition-transform" />
-              <span className="font-bold text-orange-600 dark:text-orange-400">{userStats?.currentStreak ?? 0}d</span>
-              <span className="text-amber-300 dark:text-amber-700 hidden sm:inline">|</span>
-              <span className="hidden sm:inline font-mono font-medium text-amber-800 dark:text-amber-300">Lv.{levelInfo.level}</span>
-            </button>
-          )}
+          {/* Daily Streak Indicator */}
+          <Link
+            to="/challenges/daily"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-amber-900 dark:text-amber-200 bg-amber-50 dark:bg-amber-950/60 hover:bg-amber-100 dark:hover:bg-amber-900/60 border border-amber-200/90 dark:border-amber-800 rounded-lg transition-colors shadow-2xs cursor-pointer whitespace-nowrap shrink-0 group"
+            title={`Daily Streak: ${userStats?.currentStreak ?? 0} days • Level ${levelInfo.level} • Click to play Today's Daily Coding Challenge`}
+          >
+            <Flame className="w-3.5 h-3.5 text-orange-500 fill-orange-500 group-hover:scale-110 transition-transform" />
+            <span className="font-bold text-orange-600 dark:text-orange-400">{userStats?.currentStreak ?? 0}d</span>
+            <span className="text-amber-300 dark:text-amber-700 hidden sm:inline">|</span>
+            <span className="hidden sm:inline font-mono font-medium text-amber-800 dark:text-amber-300">Lv.{levelInfo.level}</span>
+          </Link>
 
-          {/* Admin Reports Trigger */}
-          {isAdmin && onOpenAdminReports && (
-            <button
-              type="button"
-              onClick={onOpenAdminReports}
-              className="relative flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900/50 border border-rose-200 dark:border-rose-800 rounded-xl transition-colors cursor-pointer whitespace-nowrap shrink-0"
-              title="Admin Reports Management"
+          {/* Admin Control Center Trigger */}
+          {isAdmin && (
+            <Link
+              to="/admin"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800 rounded-xl transition-colors cursor-pointer whitespace-nowrap shrink-0 group"
+              title="Admin Control Center"
             >
-              <ShieldAlert className="w-3.5 h-3.5 text-rose-600" />
-              <span className="hidden 2xl:inline">Reports</span>
+              <ShieldCheck className="w-4 h-4 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform" />
+              <span className="hidden sm:inline font-bold">Admin</span>
               {pendingReportsCount > 0 && (
                 <span className="bg-rose-600 text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full tabular-nums">
                   {pendingReportsCount}
                 </span>
               )}
-            </button>
+            </Link>
           )}
 
           {/* Workspace Button for Guests */}
@@ -278,7 +272,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       className="w-full flex items-center gap-2.5 px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-left"
                     >
                       <UserIcon className="w-4 h-4 text-blue-600" />
-                      <span>My Profile & Portfolio</span>
+                      <span>My Profile</span>
                     </Link>
 
                     <Link
@@ -300,49 +294,16 @@ export const Navbar: React.FC<NavbarProps> = ({
                     </Link>
 
                     <Link
-                      to="/challenges"
+                      to="/profile"
                       onClick={() => setIsUserMenuOpen(false)}
                       className="w-full flex items-center gap-2.5 px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-left"
                     >
-                      <Flame className="w-4 h-4 text-orange-500" />
-                      <span>Daily Challenges & Quizzes</span>
+                      <Settings className="w-4 h-4 text-slate-400" />
+                      <span>Settings</span>
                     </Link>
-
-                    <Link
-                      to="/community"
-                      onClick={() => setIsUserMenuOpen(false)}
-                      className="w-full flex items-center gap-2.5 px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-left"
-                    >
-                      <MessageSquare className="w-4 h-4 text-emerald-500" />
-                      <span>Community Discussions</span>
-                    </Link>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsUserMenuOpen(false);
-                        onOpenTeam('active');
-                      }}
-                      className="w-full flex items-center gap-2.5 px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-left cursor-pointer"
-                    >
-                      <Users className="w-4 h-4 text-violet-500" />
-                      <span>Workspace / Teams</span>
-                    </button>
                   </div>
 
                   <div className="py-1">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsUserMenuOpen(false);
-                        if (onOpenReport) onOpenReport({ type: 'website' });
-                      }}
-                      className="w-full flex items-center gap-2.5 px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-left cursor-pointer"
-                    >
-                      <Flag className="w-4 h-4 text-slate-400" />
-                      <span>Report Issue / Bug</span>
-                    </button>
-
                     <button
                       type="button"
                       onClick={handleOpenSignOutModal}
@@ -399,6 +360,19 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </Link>
               );
             })}
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className={`p-2.5 rounded-xl font-bold transition-colors flex items-center gap-2 ${
+                  location.pathname === '/admin'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400'
+                }`}
+              >
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>Admin Control</span>
+              </Link>
+            )}
           </div>
 
           <div className="flex items-center justify-between pt-2">

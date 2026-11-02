@@ -315,6 +315,7 @@ class GamificationService {
           python: 0,
           sql: 0,
           cpp: 0,
+          c: 0,
           java: 0,
           javascript: 0,
           typescript: 0,
@@ -527,6 +528,7 @@ class GamificationService {
       python: 0,
       sql: 0,
       cpp: 0,
+      c: 0,
       java: 0,
       javascript: 0,
       typescript: 0,
@@ -540,6 +542,20 @@ class GamificationService {
       ...defaults,
       ...stats.languagePoints
     };
+  }
+
+  public addXp(amount: number, language?: Language): void {
+    const user = authService.getCurrentUser();
+    if (!user) return;
+    const stats = this.getStats();
+    if (!stats) return;
+    stats.xp += amount;
+    if (language) {
+      if (!stats.languagePoints) stats.languagePoints = {};
+      stats.languagePoints[language] = (stats.languagePoints[language] || 0) + amount;
+    }
+    this.saveStats(stats);
+    this.checkAchievements(stats);
   }
 
   public recordLanguageQuizCompletion(
@@ -1235,8 +1251,9 @@ class GamificationService {
 
   /**
    * Real Leaderboard:
-   * Computed strictly from actual published snippets and current user!
-   * NO FAKE USERS!
+   * Computed exclusively from real registered users with genuine verified activity.
+   * NEVER invent users, random XP, or fictional competitors.
+   * If no users have earned points (XP <= 0), returns empty array.
    */
   public getRealLeaderboard(): Array<{
     rank: number;
@@ -1246,48 +1263,56 @@ class GamificationService {
     isCurrent: boolean;
     avatar?: string;
   }> {
-    const allSnippets = snippetStorage.getAllSnippets();
     const currentUser = authService.getCurrentUser();
     const currentStats = this.getStats();
 
     const contributorsMap = new Map<string, { name: string; uploads: number; xp: number; avatar?: string; isCurrent: boolean }>();
 
-    allSnippets.forEach(snip => {
-      const authorName = snip.author?.name || snip.uploadedByMember || 'Developer';
-      const key = snip.userId || authorName;
-
-      const existing = contributorsMap.get(key) || {
-        name: authorName,
-        uploads: 0,
-        xp: 0,
-        avatar: snip.author?.avatar,
-        isCurrent: currentUser ? (snip.userId === currentUser.id || authorName === currentUser.name) : false
-      };
-
-      existing.uploads += 1;
-      existing.xp += 50 + (snip.likes || 0) * 10;
-      contributorsMap.set(key, existing);
-    });
-
-    if (currentUser && currentStats) {
-      const userKey = currentUser.id;
-      const existing = contributorsMap.get(userKey);
-      if (existing) {
-        existing.xp = Math.max(existing.xp, currentStats.xp);
-        existing.uploads = Math.max(existing.uploads, currentStats.snippetsUploaded);
-        existing.isCurrent = true;
-      } else {
-        contributorsMap.set(userKey, {
-          name: currentUser.name,
-          uploads: currentStats.snippetsUploaded,
-          xp: currentStats.xp,
-          avatar: currentUser.avatar,
-          isCurrent: true
-        });
-      }
+    // 1. Include current authenticated user ONLY if they have verified earned XP
+    if (currentUser && currentStats && currentStats.xp > 0) {
+      contributorsMap.set(currentUser.id || currentUser.uid || currentUser.email, {
+        name: currentUser.name || currentUser.email.split('@')[0],
+        uploads: currentStats.snippetsUploaded || 0,
+        xp: currentStats.xp,
+        avatar: currentUser.avatar,
+        isCurrent: true
+      });
     }
 
-    const list = Array.from(contributorsMap.values()).sort((a, b) => b.xp - a.xp);
+    // 2. Cross-reference other verified registered users stored in system (must have earned XP > 0)
+    const registeredUsers = authService.getRegisteredUsers();
+    if (Array.isArray(registeredUsers)) {
+      registeredUsers.forEach(regUser => {
+        if (!regUser || !regUser.id) return;
+        // Don't duplicate current user
+        if (currentUser && (regUser.id === currentUser.id || regUser.email === currentUser.email)) {
+          return;
+        }
+
+        // Check if there are real stats saved for this registered user
+        try {
+          const statsRaw = localStorage.getItem(`codeself_user_stats_${regUser.id}`);
+          if (statsRaw) {
+            const regStats = JSON.parse(statsRaw);
+            if (regStats && regStats.xp && regStats.xp > 0) {
+              contributorsMap.set(regUser.id, {
+                name: regUser.name || regUser.email.split('@')[0],
+                uploads: regStats.snippetsUploaded || 0,
+                xp: regStats.xp,
+                avatar: regUser.avatar,
+                isCurrent: false
+              });
+            }
+          }
+        } catch {}
+      });
+    }
+
+    // Sort strictly by real verified XP descending
+    const list = Array.from(contributorsMap.values())
+      .filter(item => item.xp > 0)
+      .sort((a, b) => b.xp - a.xp);
+
     return list.map((item, idx) => ({
       rank: idx + 1,
       ...item

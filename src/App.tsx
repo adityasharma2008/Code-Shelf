@@ -29,6 +29,7 @@ import { MySnippetsView } from './views/MySnippetsView';
 import { ProfileView } from './views/ProfileView';
 import { DailyChallengeView } from './views/DailyChallengeView';
 import { GooglePopupView } from './views/GooglePopupView';
+import { AdminControlCenterView } from './views/AdminControlCenterView';
 import { useLocation } from 'react-router-dom';
 import { getInitialTheme, applyTheme } from './utils/theme';
 
@@ -195,8 +196,18 @@ export function AppContent() {
     return <GooglePopupView />;
   }
 
+  // Dedicated full-page Admin Control Center route (runs with its own full-page layout, sidebar, header, and dashboard)
+  if (location.pathname.startsWith('/admin')) {
+    return (
+      <div className="w-full min-h-screen bg-[#F8FAFC] dark:bg-[#0B1120]">
+        <AdminControlCenterView onToast={showToast} />
+        <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans">
+    <div className="min-h-screen w-full flex flex-col bg-[#F8FAFC] dark:bg-[#0B1120] text-slate-900 dark:text-[#F8FAFC] font-sans transition-colors duration-200">
       {/* Top Navbar */}
       <Navbar
         onOpenSubmit={() => setIsSubmitOpen(true)}
@@ -206,7 +217,7 @@ export function AppContent() {
           setIsTeamOpen(true);
         }}
         onOpenAchievements={() => setIsAchievementsOpen(true)}
-        onOpenDailyGame={() => setIsGameOpen(true)}
+        onOpenDailyGame={() => navigate('/challenges/daily')}
         onOpenReport={(cfg) => {
           setReportConfig(cfg || { type: 'website' });
           setIsReportOpen(true);
@@ -214,21 +225,35 @@ export function AppContent() {
         onOpenAdminReports={() => setIsAdminReportsOpen(true)}
       />
 
-      {/* Main Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12">
-        <ErrorBoundary>
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <HomeDashboardView
-                  snippets={snippets}
-                  onOpenSubmit={() => setIsSubmitOpen(true)}
-                  onRequestAuth={(r) => handleOpenAuth(r)}
-                  onToast={showToast}
-                />
-              }
-            />
+      {/* Main Container with Full Viewport Coverage */}
+      <main className="flex-1 w-full bg-[#F8FAFC] dark:bg-[#0B1120] transition-colors duration-200">
+        <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12">
+          <ErrorBoundary>
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <HomeDashboardView
+                    snippets={snippets}
+                    onOpenSubmit={() => setIsSubmitOpen(true)}
+                    onRequestAuth={(r) => handleOpenAuth(r)}
+                    onToast={showToast}
+                  />
+                }
+              />
+              <Route
+                path="/challenges/daily"
+                element={
+                  <DailyChallengeView
+                    onToast={showToast}
+                    onRequestAuth={(r) => handleOpenAuth(r)}
+                    onOpenQuiz={(lang) => {
+                      setQuizLanguage(lang);
+                      setIsQuizOpen(true);
+                    }}
+                  />
+                }
+              />
             <Route
               path="/explore"
               element={
@@ -356,38 +381,69 @@ export function AppContent() {
             />
           </Routes>
         </ErrorBoundary>
-      </main>
+      </div>
+    </main>
 
-      {/* Clean Corporate Footer */}
-      <footer className="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-6 text-xs text-slate-500 dark:text-slate-400 transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2.5">
-            <CodeSelfLogo className="w-5 h-5 shrink-0 opacity-90" />
-            <span className="font-semibold text-slate-800 dark:text-slate-200">ChulliCode</span>
-            <span className="text-slate-300 dark:text-slate-700">·</span>
-            <span className="text-slate-600 dark:text-slate-400">Learn by building. Share by helping. Grow together.</span>
+    {/* Clean Professional Footer with Exact Branding */}
+    <footer className="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-[#111827] py-6 text-xs text-slate-500 dark:text-slate-400 transition-colors">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row items-center gap-2.5 text-center sm:text-left">
+          <div className="flex items-center gap-2">
+            <CodeSelfLogo className="w-5 h-5 shrink-0" />
+            <span className="font-bold text-slate-900 dark:text-white">ChulliCode</span>
           </div>
-
-          <div className="flex flex-wrap items-center justify-center sm:justify-end gap-3 sm:gap-4 text-slate-500 dark:text-slate-400">
-            <button
-              type="button"
-              onClick={() => {
-                setReportConfig({ type: 'website' });
-                setIsReportOpen(true);
-              }}
-              className="hover:text-slate-800 dark:hover:text-slate-200 hover:underline transition-colors cursor-pointer"
-            >
-              Report Issue / Bug
-            </button>
-            <span className="text-slate-300 dark:text-slate-700">·</span>
-            <Link to="/community" className="hover:text-slate-800 dark:hover:text-slate-200 hover:underline transition-colors">
-              Community
-            </Link>
-            <span className="text-slate-300 dark:text-slate-700">·</span>
-            <span className="font-mono tabular-nums text-slate-400 dark:text-slate-500">© 2026 ChulliCode</span>
-          </div>
+          <span className="hidden sm:inline text-slate-300 dark:text-slate-700">·</span>
+          <span className="font-semibold text-slate-700 dark:text-slate-300">Powered by Chulli Groups</span>
+          <span className="hidden sm:inline text-slate-300 dark:text-slate-700">·</span>
+          <span className="text-slate-400 dark:text-slate-500">Learn by building. Share by helping. Grow together.</span>
         </div>
-      </footer>
+
+        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-xs">
+          <Link to="/explore" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+            About
+          </Link>
+          <span className="text-slate-300 dark:text-slate-700">·</span>
+          <Link to="/community" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+            Community Guidelines
+          </Link>
+          <span className="text-slate-300 dark:text-slate-700">·</span>
+          <button
+            type="button"
+            onClick={() => showToast('ChulliCode Privacy Policy: User data is strictly protected. Real user actions only.')}
+            className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
+          >
+            Privacy Policy
+          </button>
+          <span className="text-slate-300 dark:text-slate-700">·</span>
+          <button
+            type="button"
+            onClick={() => showToast('ChulliCode Terms of Service: Collaborative and educational code sharing platform.')}
+            className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
+          >
+            Terms of Service
+          </button>
+          <span className="text-slate-300 dark:text-slate-700">·</span>
+          <button
+            type="button"
+            onClick={() => showToast('Contact support: shakti14112008@gmail.com')}
+            className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
+          >
+            Contact
+          </button>
+          <span className="text-slate-300 dark:text-slate-700">·</span>
+          <button
+            type="button"
+            onClick={() => {
+              setReportConfig({ type: 'website' });
+              setIsReportOpen(true);
+            }}
+            className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
+          >
+            Report a Bug
+          </button>
+        </div>
+      </div>
+    </footer>
 
       {/* Global Modals */}
       <SubmitSnippetModal

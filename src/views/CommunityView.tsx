@@ -318,15 +318,31 @@ export const CommunityView: React.FC<CommunityViewProps> = ({ onToast, onRequest
             ))
           ) : (
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-12 text-center text-slate-500">
-              <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-3 text-slate-400">
+              <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 flex items-center justify-center mx-auto mb-3">
                 <MessageSquare className="w-6 h-6" />
               </div>
-              <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                No discussions found
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                {searchQuery ? 'No matching discussions found' : 'No discussions yet. Start the first conversation.'}
               </h3>
-              <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
-                {searchQuery ? `No topics match "${searchQuery}". Try different keywords.` : 'Be the first to start a conversation or ask a coding question!'}
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto leading-relaxed">
+                {searchQuery ? `No topics match "${searchQuery}". Try different keywords.` : 'Ask questions, discuss algorithms, share optimizations, or get debugging help from real developers.'}
               </p>
+              <div className="mt-5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!currentUser) {
+                      onRequestAuth('Sign in with Google to start community discussions and ask questions.');
+                    } else {
+                      setIsCreateOpen(true);
+                    }
+                  }}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl shadow-xs transition-colors cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Start Discussion</span>
+                </button>
+              </div>
             </div>
           )}
         </div>

@@ -1,6 +1,6 @@
 import { authService } from './authService';
 import { db } from './firebase';
-import { collection, doc, getDocs, setDoc, updateDoc, query, where, orderBy, increment } from 'firebase/firestore';
+import { doc, setDoc, updateDoc, increment } from 'firebase/firestore';
 
 export interface SnippetComment {
   id: string;
@@ -49,73 +49,58 @@ const COMMENTS_STORAGE_KEY = 'chullicode_snippet_comments';
 const DISCUSSIONS_STORAGE_KEY = 'chullicode_discussions';
 const REPLIES_STORAGE_KEY = 'chullicode_discussion_replies';
 
-// Initial verified discussion starter for early developers (authentic, not fake people)
-const SEED_DISCUSSIONS: CommunityDiscussion[] = [
-  {
-    id: 'disc_welcome_guidelines',
-    title: 'Welcome to ChulliCode! Community Guidelines & How to Share Verified Snippets',
-    content: 'Welcome to the ChulliCode community! This platform is designed for students, beginners, and developers to learn programming, test verified code snippets in the interactive playground, and share real solutions. Before publishing, please test your algorithms in the Playground to ensure they compile and run properly. Feel free to ask questions or discuss code optimizations here!',
-    category: 'General',
-    tags: ['welcome', 'guidelines', 'community'],
-    authorId: 'system_chullicode',
-    authorName: 'ChulliCode Team',
-    authorAvatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=ChulliTeam',
-    createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),
-    upvotes: 12,
-    upvotedBy: [],
-    repliesCount: 2,
-    isSolved: true
-  },
-  {
-    id: 'disc_python_recursion_limit',
-    title: 'Understanding Python Recursion Depth and Tail Call Optimization',
-    content: 'When solving graph traversals (DFS) or deep tree problems in Python, recursion depth defaults to 1000. For large inputs, you can increase it using `sys.setrecursionlimit()` or rewrite using an explicit stack. What approaches do you recommend for production code?',
-    category: 'Best Practices',
-    tags: ['python', 'recursion', 'algorithms'],
-    authorId: 'user_dev_sample',
-    authorName: 'Shakti Sharma',
-    authorAvatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Shakti',
-    createdAt: new Date(Date.now() - 86400000).toISOString(),
-    upvotes: 7,
-    upvotedBy: [],
-    repliesCount: 1,
-    isSolved: false
-  }
-];
+// Known legacy seeded discussion and reply IDs to safely purge
+const SEED_IDS = new Set([
+  'disc_welcome_guidelines',
+  'disc_python_recursion_limit',
+  'reply_seed_1',
+  'reply_seed_2'
+]);
 
-const SEED_REPLIES: DiscussionReply[] = [
-  {
-    id: 'reply_seed_1',
-    discussionId: 'disc_welcome_guidelines',
-    authorId: 'user_sample_aarav',
-    authorName: 'Aarav Kumar',
-    authorAvatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Aarav',
-    content: 'Glad to be here! The interactive input runner in the playground makes testing competitive programming solutions so much easier.',
-    createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
-    upvotes: 4,
-    upvotedBy: []
-  },
-  {
-    id: 'reply_seed_2',
-    discussionId: 'disc_python_recursion_limit',
-    authorId: 'system_chullicode',
-    authorName: 'ChulliCode Maintainer',
-    authorAvatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Maintainer',
-    content: 'In production, an explicit `while stack:` loop is almost always safer than increasing `sys.setrecursionlimit()`, as the latter can cause a segmentation fault in CPython if the C call stack overflows.',
-    createdAt: new Date(Date.now() - 3600000 * 12).toISOString(),
-    upvotes: 5,
-    upvotedBy: [],
-    isAcceptedAnswer: true
-  }
-];
+/**
+ * Purges any legacy fake or automatically seeded discussions and replies
+ * from localStorage so no fabricated user data remains.
+ */
+function purgeFakeSeedData() {
+  try {
+    // 1. Purge discussions
+    const rawDisc = localStorage.getItem(DISCUSSIONS_STORAGE_KEY);
+    if (rawDisc) {
+      const parsed: CommunityDiscussion[] = JSON.parse(rawDisc);
+      if (Array.isArray(parsed)) {
+        const cleaned = parsed.filter(d => d && d.id && !SEED_IDS.has(d.id));
+        if (cleaned.length !== parsed.length) {
+          localStorage.setItem(DISCUSSIONS_STORAGE_KEY, JSON.stringify(cleaned));
+        }
+      }
+    }
+
+    // 2. Purge replies
+    const rawReplies = localStorage.getItem(REPLIES_STORAGE_KEY);
+    if (rawReplies) {
+      const parsed: DiscussionReply[] = JSON.parse(rawReplies);
+      if (Array.isArray(parsed)) {
+        const cleaned = parsed.filter(r => r && r.id && !SEED_IDS.has(r.id) && !SEED_IDS.has(r.discussionId));
+        if (cleaned.length !== parsed.length) {
+          localStorage.setItem(REPLIES_STORAGE_KEY, JSON.stringify(cleaned));
+        }
+      }
+    }
+  } catch {}
+}
+
+// Run purge once at module import
+purgeFakeSeedData();
 
 export const communityService = {
   // === Snippet Comments ===
   getCommentsForSnippet(snippetId: string): SnippetComment[] {
     try {
       const raw = localStorage.getItem(COMMENTS_STORAGE_KEY);
-      const list: SnippetComment[] = raw ? JSON.parse(raw) : [];
-      return list.filter(c => c.snippetId === snippetId);
+      if (!raw) return [];
+      const list: SnippetComment[] = JSON.parse(raw);
+      if (!Array.isArray(list)) return [];
+      return list.filter(c => c && c.snippetId === snippetId && !SEED_IDS.has(c.id));
     } catch {
       return [];
     }
@@ -130,7 +115,7 @@ export const communityService = {
       snippetId,
       authorId: user.id || user.uid || 'anon',
       authorName: user.name || 'Developer',
-      authorAvatar: user.avatar || 'https://api.dicebear.com/7.x/bottts/svg?seed=Dev',
+      authorAvatar: user.avatar || `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(user.email || user.id)}`,
       content: content.trim(),
       createdAt: new Date().toISOString(),
       upvotes: 0,
@@ -143,7 +128,7 @@ export const communityService = {
     list.push(newComment);
     localStorage.setItem(COMMENTS_STORAGE_KEY, JSON.stringify(list));
 
-    // Async sync to Firestore if online
+    // Async sync to Firestore if authenticated
     try {
       setDoc(doc(db, 'comments', newComment.id), newComment).catch(() => {});
     } catch {}
@@ -156,7 +141,9 @@ export const communityService = {
     const user = authService.getCurrentUser();
     if (!user) throw new Error('Sign in required to vote on comments.');
 
-    const userId = user.id || user.uid || 'anon';
+    const userId = user.id || user.uid || '';
+    if (!userId) return { upvoted: false, count: 0 };
+
     const raw = localStorage.getItem(COMMENTS_STORAGE_KEY);
     const list: SnippetComment[] = raw ? JSON.parse(raw) : [];
     const target = list.find(c => c.id === commentId);
@@ -187,15 +174,14 @@ export const communityService = {
   // === Community Discussions ===
   getAllDiscussions(): CommunityDiscussion[] {
     try {
+      purgeFakeSeedData();
       const raw = localStorage.getItem(DISCUSSIONS_STORAGE_KEY);
-      if (!raw) {
-        localStorage.setItem(DISCUSSIONS_STORAGE_KEY, JSON.stringify(SEED_DISCUSSIONS));
-        return SEED_DISCUSSIONS;
-      }
+      if (!raw) return [];
       const list: CommunityDiscussion[] = JSON.parse(raw);
-      return Array.isArray(list) ? list : SEED_DISCUSSIONS;
+      if (!Array.isArray(list)) return [];
+      return list.filter(d => d && d.id && !SEED_IDS.has(d.id));
     } catch {
-      return SEED_DISCUSSIONS;
+      return [];
     }
   },
 
@@ -215,9 +201,9 @@ export const communityService = {
       content: params.content.trim(),
       category: params.category,
       tags: params.tags,
-      authorId: user.id || user.uid || 'anon',
+      authorId: user.id || user.uid || '',
       authorName: user.name || 'Developer',
-      authorAvatar: user.avatar || 'https://api.dicebear.com/7.x/bottts/svg?seed=Dev',
+      authorAvatar: user.avatar || `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(user.email || user.id)}`,
       createdAt: new Date().toISOString(),
       upvotes: 0,
       upvotedBy: [],
@@ -242,7 +228,9 @@ export const communityService = {
     const user = authService.getCurrentUser();
     if (!user) throw new Error('Sign in required to vote on discussions.');
 
-    const userId = user.id || user.uid || 'anon';
+    const userId = user.id || user.uid || '';
+    if (!userId) return { upvoted: false, count: 0 };
+
     const list = this.getAllDiscussions();
     const target = list.find(d => d.id === discussionId);
     if (!target) return { upvoted: false, count: 0 };
@@ -257,6 +245,7 @@ export const communityService = {
     }
 
     localStorage.setItem(DISCUSSIONS_STORAGE_KEY, JSON.stringify(list));
+
     try {
       updateDoc(doc(db, 'discussions', discussionId), {
         upvotes: target.upvotes,
@@ -270,15 +259,14 @@ export const communityService = {
 
   getRepliesForDiscussion(discussionId: string): DiscussionReply[] {
     try {
+      purgeFakeSeedData();
       const raw = localStorage.getItem(REPLIES_STORAGE_KEY);
-      if (!raw) {
-        localStorage.setItem(REPLIES_STORAGE_KEY, JSON.stringify(SEED_REPLIES));
-        return SEED_REPLIES.filter(r => r.discussionId === discussionId);
-      }
+      if (!raw) return [];
       const list: DiscussionReply[] = JSON.parse(raw);
-      return list.filter(r => r.discussionId === discussionId);
+      if (!Array.isArray(list)) return [];
+      return list.filter(r => r && r.discussionId === discussionId && !SEED_IDS.has(r.id));
     } catch {
-      return SEED_REPLIES.filter(r => r.discussionId === discussionId);
+      return [];
     }
   },
 
@@ -289,9 +277,9 @@ export const communityService = {
     const newReply: DiscussionReply = {
       id: `reply_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
       discussionId,
-      authorId: user.id || user.uid || 'anon',
+      authorId: user.id || user.uid || '',
       authorName: user.name || 'Developer',
-      authorAvatar: user.avatar || 'https://api.dicebear.com/7.x/bottts/svg?seed=Dev',
+      authorAvatar: user.avatar || `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(user.email || user.id)}`,
       content: content.trim(),
       createdAt: new Date().toISOString(),
       upvotes: 0,
@@ -301,9 +289,10 @@ export const communityService = {
 
     // Save reply
     const raw = localStorage.getItem(REPLIES_STORAGE_KEY);
-    const list: DiscussionReply[] = raw ? JSON.parse(raw) : [...SEED_REPLIES];
-    list.push(newReply);
-    localStorage.setItem(REPLIES_STORAGE_KEY, JSON.stringify(list));
+    const list: DiscussionReply[] = raw ? JSON.parse(raw) : [];
+    const cleaned = list.filter(r => r && !SEED_IDS.has(r.id));
+    cleaned.push(newReply);
+    localStorage.setItem(REPLIES_STORAGE_KEY, JSON.stringify(cleaned));
 
     // Update discussion reply count
     const discList = this.getAllDiscussions();
@@ -330,11 +319,14 @@ export const communityService = {
     const disc = discList.find(d => d.id === discussionId);
     if (!disc) return false;
 
-    // Only discussion author can accept an answer
-    if (disc.authorId !== (user.id || user.uid)) return false;
+    // Only the genuine discussion author or admin can accept an answer
+    const currentUid = user.id || user.uid;
+    if (disc.authorId !== currentUid && user.email?.toLowerCase() !== 'shakti14112008@gmail.com') {
+      return false;
+    }
 
     const raw = localStorage.getItem(REPLIES_STORAGE_KEY);
-    const list: DiscussionReply[] = raw ? JSON.parse(raw) : [...SEED_REPLIES];
+    const list: DiscussionReply[] = raw ? JSON.parse(raw) : [];
     const reply = list.find(r => r.id === replyId);
     if (!reply) return false;
 
@@ -348,6 +340,11 @@ export const communityService = {
     disc.isSolved = newState;
     localStorage.setItem(REPLIES_STORAGE_KEY, JSON.stringify(list));
     localStorage.setItem(DISCUSSIONS_STORAGE_KEY, JSON.stringify(discList));
+
+    try {
+      updateDoc(doc(db, 'discussion_replies', replyId), { isAcceptedAnswer: newState }).catch(() => {});
+      updateDoc(doc(db, 'discussions', discussionId), { isSolved: newState }).catch(() => {});
+    } catch {}
 
     window.dispatchEvent(new Event('chullicode_discussions_updated'));
     return newState;

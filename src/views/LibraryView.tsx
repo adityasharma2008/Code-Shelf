@@ -565,6 +565,27 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
             })}
           </div>
         )
+      ) : snippets.length === 0 ? (
+        <div className="py-16 px-6 text-center rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs max-w-lg mx-auto">
+          <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 flex items-center justify-center mx-auto mb-3">
+            <Code2 className="w-6 h-6" />
+          </div>
+          <h3 className="text-base font-bold text-slate-900 dark:text-white">
+            No snippets published yet. Share your first code snippet.
+          </h3>
+          <p className="mt-1.5 text-xs text-slate-600 dark:text-slate-400 max-w-sm mx-auto leading-relaxed">
+            Be the first to share your code with the community. Publish an algorithm, data structure, or utility function.
+          </p>
+          <div className="mt-5">
+            <button
+              onClick={onOpenSubmit}
+              className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold rounded-xl transition-colors shadow-xs cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Submit Code</span>
+            </button>
+          </div>
+        </div>
       ) : (
         <div className="py-16 px-6 text-center rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs max-w-lg mx-auto">
           <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto mb-3">

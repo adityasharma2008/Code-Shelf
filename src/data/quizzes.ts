@@ -1255,5 +1255,138 @@ print_r($doubled);`,
         explanation: '`min-width: 768px` applies styles when the screen width is 768px or greater, following the mobile-first CSS methodology.'
       }
     ]
+  },
+  c: {
+    language: 'c',
+    languageName: 'C',
+    title: 'C Systems & Pointers Certification Quiz',
+    description: '10 comprehensive questions testing pointers, manual memory allocation, arrays, structs, and preprocessor directives.',
+    totalQuestions: 10,
+    pointsPerCorrect: 15,
+    completionBonus: 50,
+    questions: [
+      {
+        id: 'c_1',
+        topic: 'Pointers & Dereferencing',
+        difficulty: 'Beginner',
+        question: 'What is the output of this C pointer code?',
+        codeSnippet: `int x = 42;
+int *p = &x;
+*p = 99;
+printf("%d", x);`,
+        options: ['99', '42', 'Memory address of x', 'Segmentation fault'],
+        correctIndex: 0,
+        explanation: 'Dereferencing `*p = 99` writes directly into the memory location of `x`, mutating its value to 99.'
+      },
+      {
+        id: 'c_2',
+        topic: 'Dynamic Memory Allocation',
+        difficulty: 'Intermediate',
+        question: 'Which function allocates heap memory in C and what does it return if allocation fails?',
+        options: [
+          'malloc() returns NULL',
+          'alloc() returns 0',
+          'new returns nullptr',
+          'heap_alloc() returns -1'
+        ],
+        correctIndex: 0,
+        explanation: 'malloc() requests memory on the process heap and returns NULL if the OS cannot satisfy the request.'
+      },
+      {
+        id: 'c_3',
+        topic: 'Pointer Arithmetic',
+        difficulty: 'Intermediate',
+        question: 'If int* ptr points to arr[0], what does *(ptr + 2) evaluate to?',
+        codeSnippet: `int arr[] = {10, 20, 30, 40};
+int *ptr = arr;
+printf("%d", *(ptr + 2));`,
+        options: ['30', '12', '20', '40'],
+        correctIndex: 0,
+        explanation: 'Pointer arithmetic increments by units of sizeof(int), so `ptr + 2` points to arr[2] (value 30).'
+      },
+      {
+        id: 'c_4',
+        topic: 'sizeof Operator',
+        difficulty: 'Beginner',
+        question: 'What does sizeof evaluate at?',
+        options: [
+          'Compile time',
+          'Runtime via OS syscall',
+          'Link time',
+          'Preprocessor expansion time'
+        ],
+        correctIndex: 0,
+        explanation: 'sizeof is a compile-time operator evaluated by the compiler based on type sizes (except for C99 variable-length arrays).'
+      },
+      {
+        id: 'c_5',
+        topic: 'Null Terminator',
+        difficulty: 'Beginner',
+        question: 'What character marks the end of a string in standard C?',
+        options: ['\\0 (ASCII 0)', '\\n', 'EOF', 'NULL pointer'],
+        correctIndex: 0,
+        explanation: 'C strings are null-terminated character arrays ending with the null byte `\\0`.'
+      },
+      {
+        id: 'c_6',
+        topic: 'Pass by Reference Simulation',
+        difficulty: 'Intermediate',
+        question: 'How do you achieve pass-by-reference in C?',
+        options: [
+          'By passing pointer addresses to variables',
+          'Using the & reference keyword like in C++',
+          'All parameters in C are passed by reference by default',
+          'Using global extern variables'
+        ],
+        correctIndex: 0,
+        explanation: 'C only supports pass-by-value. Pass-by-reference is simulated by passing pointer addresses by value.'
+      },
+      {
+        id: 'c_7',
+        topic: 'Structures and Arrow Operator',
+        difficulty: 'Intermediate',
+        question: 'If ptr is a pointer to a struct, which operator accesses its fields directly?',
+        options: ['ptr->field', 'ptr.field', 'ptr::field', 'ptr=>field'],
+        correctIndex: 0,
+        explanation: 'The arrow operator `->` is syntactic sugar for dereference and dot access: `(*ptr).field`.'
+      },
+      {
+        id: 'c_8',
+        topic: 'Memory Deallocation',
+        difficulty: 'Intermediate',
+        question: 'What happens if you free() a pointer and then dereference it without reassigning?',
+        options: [
+          'Undefined behavior (Use-After-Free bug)',
+          'Returns 0 cleanly',
+          'Reallocates automatically',
+          'Throws MemoryAccessException'
+        ],
+        correctIndex: 0,
+        explanation: 'Accessing memory after it has been freed is undefined behavior (Use-After-Free) and a major security vulnerability.'
+      },
+      {
+        id: 'c_9',
+        topic: 'Preprocessor Directives',
+        difficulty: 'Beginner',
+        question: 'What does the preprocessor directive #include <stdio.h> do?',
+        options: [
+          'Pastes the entire contents of stdio.h into the file before compilation',
+          'Compiles stdio.c into an executable',
+          'Links the standard C library binary',
+          'Allocates standard input streams'
+        ],
+        correctIndex: 0,
+        explanation: 'The preprocessor replaces the `#include` line with the textual content of the header file before compiler parsing.'
+      },
+      {
+        id: 'c_10',
+        topic: 'Bitwise Operators',
+        difficulty: 'Advanced',
+        question: 'What is the result of 1 << 3 in C?',
+        options: ['8', '3', '6', '13'],
+        correctIndex: 0,
+        explanation: 'Bitwise left shift `1 << 3` shifts the bit 1 three positions left, evaluating to 2^3 = 8.'
+      }
+    ]
   }
 };
