@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { User, ActiveTeamSession } from '../types';
 import { authService } from '../services/authService';
 import { teamService } from '../services/teamService';
@@ -7,7 +7,7 @@ import {
   Plus, Bookmark, Code2, LogIn, LogOut, FolderCode, 
   Users, Flame, Trophy, ShieldAlert, Flag, Sparkles, 
   User as UserIcon, Sun, Moon, Menu, X, BookOpen, 
-  Terminal, MessageSquare, Compass, ShieldCheck, Settings
+  Terminal, MessageSquare, Compass, ShieldCheck, Settings, Search
 } from 'lucide-react';
 import { CodeSelfLogo } from './CodeSelfLogo';
 import { gamificationService } from '../services/gamificationService';
@@ -15,6 +15,8 @@ import { reportService } from '../services/reportService';
 import { useTheme } from '../utils/theme';
 
 interface NavbarProps {
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
   onOpenSubmit: () => void;
   onOpenAuth: () => void;
   onOpenTeam: (tab?: 'join' | 'create' | 'active') => void;
@@ -25,6 +27,8 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
+  searchQuery = '',
+  onSearchChange,
   onOpenSubmit,
   onOpenAuth,
   onOpenTeam,
@@ -33,7 +37,9 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenReport,
   onOpenAdminReports
 }) => {
+  const navigate = useNavigate();
   const location = useLocation();
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const { theme, toggleTheme } = useTheme();
   const [currentUser, setCurrentUser] = useState<User | null>(() => authService.getCurrentUser());
   const [activeTeam, setActiveTeam] = useState<ActiveTeamSession | null>(() => teamService.getActiveTeam());
@@ -99,6 +105,38 @@ export const Navbar: React.FC<NavbarProps> = ({
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
 
+  // Focus search input on '/' or 'Ctrl+K' / 'Cmd+K'
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const activeEl = document.activeElement;
+      const isInput = activeEl?.tagName === 'INPUT' || activeEl?.tagName === 'TEXTAREA' || (activeEl as HTMLElement)?.isContentEditable;
+      if (e.key === '/' && !isInput) {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  const handleSearchInputChange = (value: string) => {
+    onSearchChange?.(value);
+  };
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      if (!['/', '/explore', '/saved', '/my-snippets'].includes(location.pathname)) {
+        navigate('/explore');
+      }
+    } else if (e.key === 'Escape') {
+      onSearchChange?.('');
+      searchInputRef.current?.blur();
+    }
+  };
+
   const handleOpenSignOutModal = () => {
     setIsUserMenuOpen(false);
     setShowSignOutModal(true);
@@ -157,6 +195,36 @@ export const Navbar: React.FC<NavbarProps> = ({
               );
             })}
           </nav>
+        </div>
+
+        {/* Global Search Input (Desktop & Tablet) */}
+        <div className="hidden md:flex flex-1 max-w-xs md:max-w-sm lg:max-w-md mx-2 sm:mx-4">
+          <div className="relative w-full flex items-center">
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 pointer-events-none" />
+            <input
+              ref={searchInputRef}
+              type="text"
+              value={searchQuery}
+              onChange={(e) => handleSearchInputChange(e.target.value)}
+              onKeyDown={handleSearchKeyDown}
+              placeholder="Search code by title, tag, language..."
+              className="w-full pl-8.5 pr-8 py-1.5 text-xs bg-slate-100/90 dark:bg-slate-800/90 hover:bg-slate-100 dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 focus:border-blue-500 dark:focus:border-blue-400 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 outline-none transition-all shadow-2xs"
+            />
+            {searchQuery ? (
+              <button
+                type="button"
+                onClick={() => onSearchChange?.('')}
+                className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 absolute right-2 cursor-pointer"
+                title="Clear search"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            ) : (
+              <span className="hidden lg:inline-flex items-center text-[10px] font-mono text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-slate-700 rounded px-1.5 py-0.5 absolute right-2 pointer-events-none">
+                /
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Right: Actions */}
@@ -342,7 +410,30 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Mobile Drawer Navigation */}
       {isMobileMenuOpen && (
-        <div className="xl:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-4 space-y-2 shadow-xl animate-in slide-in-from-top-2 duration-150 text-xs">
+        <div className="xl:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-4 space-y-3 shadow-xl animate-in slide-in-from-top-2 duration-150 text-xs">
+          {/* Mobile Global Search */}
+          <div className="relative flex items-center">
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => handleSearchInputChange(e.target.value)}
+              onKeyDown={handleSearchKeyDown}
+              placeholder="Search code by title, tag, language..."
+              className="w-full pl-8.5 pr-8 py-2 text-xs bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 outline-none"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => onSearchChange?.('')}
+                className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 absolute right-2 cursor-pointer"
+                title="Clear search"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
           <div className="grid grid-cols-2 gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
             {navLinks.map((link) => {
               const isActive = location.pathname === link.to;

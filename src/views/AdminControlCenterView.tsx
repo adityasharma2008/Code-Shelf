@@ -170,7 +170,14 @@ export const AdminControlCenterView: React.FC<AdminControlCenterViewProps> = ({ 
   const pendingReportsCount = reports.filter(r => r.status === 'pending').length;
   const realLeaderboard = gamificationService.getRealLeaderboard();
 
-  const navItems = [
+  interface AdminNavItem {
+    id: AdminSection;
+    label: string;
+    icon: any;
+    badge?: number;
+  }
+
+  const navItems: AdminNavItem[] = [
     { id: 'overview', label: '1. Overview', icon: Sliders },
     { id: 'users', label: `2. User Management (${users.length})`, icon: Users },
     { id: 'code', label: `3. Code Repository (${snippets.length})`, icon: FileCode2 },
@@ -182,7 +189,7 @@ export const AdminControlCenterView: React.FC<AdminControlCenterViewProps> = ({ 
     { id: 'analytics', label: '9. Platform Analytics', icon: BarChart3 },
     { id: 'audit', label: `10. Audit Logs (${auditLogs.length})`, icon: Activity },
     { id: 'settings', label: '11. Platform Settings', icon: Settings },
-  ] as const;
+  ];
 
   return (
     <div className="w-full min-h-screen flex flex-col bg-[#F8FAFC] dark:bg-[#0B1120] text-slate-900 dark:text-slate-100 font-sans transition-colors">
@@ -607,7 +614,7 @@ export const AdminControlCenterView: React.FC<AdminControlCenterViewProps> = ({ 
                             return (
                               (s.title && s.title.toLowerCase().includes(q)) ||
                               (s.language && s.language.toLowerCase().includes(q)) ||
-                              (s.authorName && s.authorName.toLowerCase().includes(q))
+                              (s.author?.name && s.author.name.toLowerCase().includes(q))
                             );
                           })
                           .map(s => (
@@ -623,7 +630,7 @@ export const AdminControlCenterView: React.FC<AdminControlCenterViewProps> = ({ 
                                 </span>
                               </td>
                               <td className="px-4 py-3 text-slate-600 dark:text-slate-400">
-                                {s.authorName || 'Developer'}
+                                {s.author?.name || 'Developer'}
                               </td>
                               <td className="px-4 py-3 text-slate-500 font-mono text-[11px]">
                                 {new Date(s.createdAt).toLocaleDateString()}
@@ -707,7 +714,7 @@ export const AdminControlCenterView: React.FC<AdminControlCenterViewProps> = ({ 
                               </td>
                               <td className="px-4 py-3 text-slate-500">{d.category}</td>
                               <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{d.authorName}</td>
-                              <td className="px-4 py-3 font-mono text-[11px]">{d.replies?.length || 0}</td>
+                              <td className="px-4 py-3 font-mono text-[11px]">{d.repliesCount || 0}</td>
                               <td className="px-4 py-3 text-right">
                                 <button
                                   type="button"
@@ -755,7 +762,7 @@ export const AdminControlCenterView: React.FC<AdminControlCenterViewProps> = ({ 
                     >
                       <div className="flex items-center justify-between">
                         <span className="font-bold text-slate-900 dark:text-white text-sm">
-                          {track.title}
+                          {track.name}
                         </span>
                         <span className="px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-mono text-[10px] uppercase font-bold">
                           {track.language}
@@ -1166,23 +1173,20 @@ export const AdminControlCenterView: React.FC<AdminControlCenterViewProps> = ({ 
                   </div>
                   <input
                     type="checkbox"
-                    checked={settings.allowSnippetSubmission}
-                    onChange={e => handleUpdateSettings({ allowSnippetSubmission: e.target.checked })}
+                    checked={settings.allowSnippetSubmissions}
+                    onChange={e => handleUpdateSettings({ allowSnippetSubmissions: e.target.checked })}
                     className="w-4 h-4 accent-blue-600 rounded cursor-pointer"
                   />
                 </div>
 
                 <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
                   <div>
-                    <h4 className="font-bold text-slate-900 dark:text-white">Community Forum Access</h4>
-                    <p className="text-slate-500">Enable technical discussion threads and comment replies.</p>
+                    <h4 className="font-bold text-slate-900 dark:text-white">Max Daily Uploads Per User</h4>
+                    <p className="text-slate-500">Volumetric threshold to prevent spam and rate-limit uploads.</p>
                   </div>
-                  <input
-                    type="checkbox"
-                    checked={settings.allowDiscussions}
-                    onChange={e => handleUpdateSettings({ allowDiscussions: e.target.checked })}
-                    className="w-4 h-4 accent-blue-600 rounded cursor-pointer"
-                  />
+                  <span className="font-mono font-bold text-xs bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded">
+                    {settings.maxDailySnippetUploads || 20} / day
+                  </span>
                 </div>
 
                 <div className="flex items-center justify-between">

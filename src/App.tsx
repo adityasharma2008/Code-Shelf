@@ -39,7 +39,24 @@ export function AppContent() {
 
   // App-level state (starts empty or with real user submissions)
   const [snippets, setSnippets] = useState<Snippet[]>(() => snippetStorage.getAllSnippets());
+  const [globalSearchQuery, setGlobalSearchQuery] = useState('');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Global search filtering across snippet title, language, tags, author, category, description
+  const filteredSnippets = React.useMemo(() => {
+    const q = globalSearchQuery.trim().toLowerCase();
+    if (!q) return snippets;
+    return snippets.filter(s => {
+      if (!s) return false;
+      const titleMatch = (s.title || '').toLowerCase().includes(q);
+      const langMatch = (s.language || '').toLowerCase().includes(q);
+      const tagsMatch = Array.isArray(s.tags) && s.tags.some(t => (t || '').toLowerCase().includes(q));
+      const descMatch = (s.description || '').toLowerCase().includes(q);
+      const authorMatch = (s.author?.name || '').toLowerCase().includes(q);
+      const catMatch = (s.category || '').toLowerCase().includes(q);
+      return titleMatch || langMatch || tagsMatch || descMatch || authorMatch || catMatch;
+    });
+  }, [snippets, globalSearchQuery]);
 
   // Modals
   const [isSubmitOpen, setIsSubmitOpen] = useState(false);
@@ -210,6 +227,8 @@ export function AppContent() {
     <div className="min-h-screen w-full flex flex-col bg-[#F8FAFC] dark:bg-[#0B1120] text-slate-900 dark:text-[#F8FAFC] font-sans transition-colors duration-200">
       {/* Top Navbar */}
       <Navbar
+        searchQuery={globalSearchQuery}
+        onSearchChange={setGlobalSearchQuery}
         onOpenSubmit={() => setIsSubmitOpen(true)}
         onOpenAuth={() => handleOpenAuth()}
         onOpenTeam={(tab) => {
@@ -234,7 +253,9 @@ export function AppContent() {
                 path="/"
                 element={
                   <HomeDashboardView
-                    snippets={snippets}
+                    snippets={filteredSnippets}
+                    globalSearchQuery={globalSearchQuery}
+                    onClearSearch={() => setGlobalSearchQuery('')}
                     onOpenSubmit={() => setIsSubmitOpen(true)}
                     onRequestAuth={(r) => handleOpenAuth(r)}
                     onToast={showToast}
@@ -259,6 +280,8 @@ export function AppContent() {
               element={
                 <LibraryView
                   snippets={snippets}
+                  searchQuery={globalSearchQuery}
+                  onSearchChange={setGlobalSearchQuery}
                   onToast={showToast}
                   onOpenSubmit={() => setIsSubmitOpen(true)}
                   onOpenDailyGame={() => navigate('/challenges')}
@@ -311,13 +334,13 @@ export function AppContent() {
             />
             <Route
               path="/saved"
-              element={<SavedView snippets={snippets} onToast={showToast} />}
+              element={<SavedView snippets={filteredSnippets} onToast={showToast} />}
             />
             <Route
               path="/my-snippets"
               element={
                 <MySnippetsView
-                  snippets={snippets}
+                  snippets={filteredSnippets}
                   onToast={showToast}
                   onOpenSubmit={() => setIsSubmitOpen(true)}
                 />
@@ -338,6 +361,19 @@ export function AppContent() {
                 <ProfileView
                   onToast={showToast}
                   onRequestAuth={(r) => handleOpenAuth(r)}
+                />
+              }
+            />
+            <Route
+              path="/challenges/daily"
+              element={
+                <DailyChallengeView
+                  onToast={showToast}
+                  onRequestAuth={(r) => handleOpenAuth(r)}
+                  onOpenQuiz={(lang) => {
+                    setQuizLanguage(lang);
+                    setIsQuizOpen(true);
+                  }}
                 />
               }
             />
@@ -385,62 +421,71 @@ export function AppContent() {
     </main>
 
     {/* Clean Professional Footer with Exact Branding */}
-    <footer className="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-[#111827] py-6 text-xs text-slate-500 dark:text-slate-400 transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="flex flex-col sm:flex-row items-center gap-2.5 text-center sm:text-left">
-          <div className="flex items-center gap-2">
-            <CodeSelfLogo className="w-5 h-5 shrink-0" />
-            <span className="font-bold text-slate-900 dark:text-white">ChulliCode</span>
+    <footer className="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-[#111827] text-slate-600 dark:text-slate-400 text-xs transition-colors py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-6 pb-6 border-b border-slate-100 dark:border-slate-800/80">
+          {/* Brand & Subtitle */}
+          <div className="flex flex-col items-center md:items-start text-center md:text-left gap-1.5">
+            <div className="flex items-center gap-2.5">
+              <CodeSelfLogo className="w-6 h-6 shrink-0" />
+              <span className="text-base font-bold text-slate-900 dark:text-white tracking-tight">
+                ChulliCode
+              </span>
+            </div>
+            <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+              Powered by Chulli Groups
+            </p>
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 max-w-sm mt-0.5">
+              Empowering beginner developers and students with code repositories, step-by-step interactive curricula, and daily algorithmic challenges.
+            </p>
           </div>
-          <span className="hidden sm:inline text-slate-300 dark:text-slate-700">·</span>
-          <span className="font-semibold text-slate-700 dark:text-slate-300">Powered by Chulli Groups</span>
-          <span className="hidden sm:inline text-slate-300 dark:text-slate-700">·</span>
-          <span className="text-slate-400 dark:text-slate-500">Learn by building. Share by helping. Grow together.</span>
+
+          {/* Navigation & Legal Links */}
+          <div className="flex flex-wrap items-center justify-center md:justify-end gap-x-6 gap-y-2.5 text-xs font-medium">
+            <Link to="/explore" className="text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+              About
+            </Link>
+            <Link to="/community" className="text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+              Community Guidelines
+            </Link>
+            <button
+              type="button"
+              onClick={() => showToast('ChulliCode Privacy Policy: User data is strictly protected. Real user actions only.')}
+              className="text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
+            >
+              Privacy Policy
+            </button>
+            <button
+              type="button"
+              onClick={() => showToast('ChulliCode Terms of Service: Collaborative and educational code sharing platform.')}
+              className="text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
+            >
+              Terms of Service
+            </button>
+            <button
+              type="button"
+              onClick={() => showToast('Contact support: shakti14112008@gmail.com')}
+              className="text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
+            >
+              Contact
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setReportConfig({ type: 'website' });
+                setIsReportOpen(true);
+              }}
+              className="text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
+            >
+              Report a Bug
+            </button>
+          </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-xs">
-          <Link to="/explore" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-            About
-          </Link>
-          <span className="text-slate-300 dark:text-slate-700">·</span>
-          <Link to="/community" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-            Community Guidelines
-          </Link>
-          <span className="text-slate-300 dark:text-slate-700">·</span>
-          <button
-            type="button"
-            onClick={() => showToast('ChulliCode Privacy Policy: User data is strictly protected. Real user actions only.')}
-            className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
-          >
-            Privacy Policy
-          </button>
-          <span className="text-slate-300 dark:text-slate-700">·</span>
-          <button
-            type="button"
-            onClick={() => showToast('ChulliCode Terms of Service: Collaborative and educational code sharing platform.')}
-            className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
-          >
-            Terms of Service
-          </button>
-          <span className="text-slate-300 dark:text-slate-700">·</span>
-          <button
-            type="button"
-            onClick={() => showToast('Contact support: shakti14112008@gmail.com')}
-            className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
-          >
-            Contact
-          </button>
-          <span className="text-slate-300 dark:text-slate-700">·</span>
-          <button
-            type="button"
-            onClick={() => {
-              setReportConfig({ type: 'website' });
-              setIsReportOpen(true);
-            }}
-            className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
-          >
-            Report a Bug
-          </button>
+        {/* Bottom Copyright Row */}
+        <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-400 dark:text-slate-500 text-center sm:text-left">
+          <p>© {new Date().getFullYear()} ChulliCode. All rights reserved.</p>
+          <p className="font-mono">Built for authentic developers · Zero fabricated data</p>
         </div>
       </div>
     </footer>

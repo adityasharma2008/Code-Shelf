@@ -16,16 +16,20 @@ interface LibraryViewProps {
   onToast: (msg: string) => void;
   onOpenSubmit: () => void;
   onOpenDailyGame?: () => void;
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
 }
 
 export const LibraryView: React.FC<LibraryViewProps> = ({
   snippets,
   onToast,
   onOpenSubmit,
-  onOpenDailyGame
+  onOpenDailyGame,
+  searchQuery: propSearchQuery,
+  onSearchChange
 }) => {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(propSearchQuery || '');
   const [selectedLanguage, setSelectedLanguage] = useState<string>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
@@ -35,6 +39,13 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
   const [userStats, setUserStats] = useState(() => gamificationService.getStats());
   const [levelInfo, setLevelInfo] = useState(() => gamificationService.getLevelInfo());
   const searchContainerRef = useRef<HTMLDivElement>(null);
+
+  // Sync internal state if propSearchQuery changes from global Navbar
+  useEffect(() => {
+    if (propSearchQuery !== undefined && propSearchQuery !== searchQuery) {
+      setSearchQuery(propSearchQuery);
+    }
+  }, [propSearchQuery]);
 
   useEffect(() => {
     const handleGamification = () => {
@@ -298,7 +309,9 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
               placeholder="Search by title, description, tags, author, or code..."
               value={searchQuery}
               onChange={(e) => {
-                setSearchQuery(e.target.value);
+                const val = e.target.value;
+                setSearchQuery(val);
+                onSearchChange?.(val);
                 setShowSuggestions(true);
               }}
               onFocus={() => setShowSuggestions(true)}
@@ -309,6 +322,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                 type="button"
                 onClick={() => {
                   setSearchQuery('');
+                  onSearchChange?.('');
                   setShowSuggestions(false);
                 }}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"

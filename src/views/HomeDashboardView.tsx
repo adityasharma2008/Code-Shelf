@@ -10,28 +10,33 @@ import {
   Play, BookOpen, Flame, ShieldCheck, Trophy, Sparkles, 
   ArrowRight, Code2, Plus, Bookmark, MessageSquare, 
   CheckCircle2, Compass, Layers, Terminal, ChevronRight,
-  Clock, Zap, Check, Lock
+  Clock, Zap, Check, Lock, Search
 } from 'lucide-react';
+import { getTodayAlgorithmicChallenge } from '../data/dailyChallengesData';
 
 interface HomeDashboardViewProps {
   snippets: Snippet[];
   onOpenSubmit: () => void;
   onRequestAuth: (reason: string) => void;
   onToast: (msg: string) => void;
+  globalSearchQuery?: string;
+  onClearSearch?: () => void;
 }
 
 export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
   snippets,
   onOpenSubmit,
   onRequestAuth,
-  onToast
+  onToast,
+  globalSearchQuery,
+  onClearSearch
 }) => {
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState<User | null>(() => authService.getCurrentUser());
   const [stats, setStats] = useState(() => gamificationService.getStats());
   const [levelInfo, setLevelInfo] = useState<LevelInfo>(() => gamificationService.getLevelInfo());
   const [isChallengeCompletedToday, setIsChallengeCompletedToday] = useState(() => gamificationService.isDailyGameCompletedToday());
-  const [todayChallenge, setTodayChallenge] = useState(() => gamificationService.getTodayChallenge());
+  const [todayChallenge, setTodayChallenge] = useState(() => getTodayAlgorithmicChallenge().challenge);
   const [discussions, setDiscussions] = useState<CommunityDiscussion[]>(() => communityService.getAllDiscussions().slice(0, 3));
   const [activeTrackId, setActiveTrackId] = useState<string | undefined>(() => learningService.getActiveTrackId());
 
@@ -41,7 +46,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
       setStats(gamificationService.getStats());
       setLevelInfo(gamificationService.getLevelInfo());
       setIsChallengeCompletedToday(gamificationService.isDailyGameCompletedToday());
-      setTodayChallenge(gamificationService.getTodayChallenge());
+      setTodayChallenge(getTodayAlgorithmicChallenge().challenge);
       setDiscussions(communityService.getAllDiscussions().slice(0, 3));
       setActiveTrackId(learningService.getActiveTrackId());
     };
@@ -240,25 +245,25 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h3 className="font-bold text-sm text-slate-900 dark:text-white">{todayChallenge.title}</h3>
-                  <span className="text-xs text-slate-500">{todayChallenge.prompt}</span>
+                  <span className="text-xs text-slate-500">{todayChallenge.category} · {todayChallenge.testCases.length} Test Cases</span>
                 </div>
-                <span className="px-2 py-0.5 text-[10px] font-mono bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 rounded uppercase">
-                  {todayChallenge.language}
+                <span className="px-2 py-0.5 text-[10px] font-bold uppercase rounded bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300">
+                  {todayChallenge.difficulty}
                 </span>
               </div>
 
               <div className="flex items-center justify-between pt-2 border-t border-slate-200/60 dark:border-slate-800/60">
                 {isChallengeCompletedToday ? (
-                  <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
                     <CheckCircle2 className="w-4 h-4" />
-                    <span>Completed Today! Streak Protected</span>
+                    <span>Completed Today! Streak Preserved</span>
                   </span>
                 ) : (
                   <span className="text-xs text-slate-500">Unsolved today</span>
                 )}
 
                 <Link
-                  to="/challenges"
+                  to="/challenges/daily"
                   className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-lg transition-colors"
                 >
                   <span>{isChallengeCompletedToday ? 'Review Solution' : 'Solve Challenge'}</span>
@@ -285,6 +290,26 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
                 <ChevronRight className="w-3.5 h-3.5" />
               </Link>
             </div>
+
+            {globalSearchQuery && (
+              <div className="flex items-center justify-between px-3.5 py-2 bg-blue-50/90 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 rounded-xl text-xs text-blue-800 dark:text-blue-300">
+                <div className="flex items-center gap-2 truncate">
+                  <Search className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
+                  <span className="truncate">
+                    Filtering by &ldquo;<strong className="font-semibold">{globalSearchQuery}</strong>&rdquo; ({snippets.length} matching {snippets.length === 1 ? 'snippet' : 'snippets'})
+                  </span>
+                </div>
+                {onClearSearch && (
+                  <button
+                    type="button"
+                    onClick={onClearSearch}
+                    className="ml-3 text-[11px] font-semibold text-blue-600 dark:text-blue-400 hover:underline shrink-0 cursor-pointer"
+                  >
+                    Clear filter
+                  </button>
+                )}
+              </div>
+            )}
 
             {recentRepositorySnippets.length === 0 ? (
               <div className="p-8 text-center bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl space-y-2">

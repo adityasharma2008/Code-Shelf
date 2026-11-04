@@ -501,7 +501,7 @@ export const DailyChallengeView: React.FC<DailyChallengeViewProps> = ({
               code={code}
               onChange={setCode}
               language={selectedLanguage === 'cpp' ? 'cpp' : selectedLanguage === 'python' ? 'python' : selectedLanguage === 'typescript' ? 'typescript' : 'javascript'}
-              height="460px"
+              minHeight="460px"
             />
           </div>
 
